@@ -6,7 +6,7 @@ public class CameraSize : MonoBehaviour
 {
     void Start()
     {
-        float newCameraSize = (float)Screen.height / 2 / 1;
+        float newCameraSize = (float)Screen.height / 2;
         Camera.main.orthographicSize = newCameraSize;
     }
 }
