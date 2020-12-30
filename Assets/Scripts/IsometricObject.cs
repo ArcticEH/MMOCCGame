@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Mirror;
 using UnityEngine;
 
-public class IsometricObject : NetworkBehaviour
+public class IsometricObject : MonoBehaviour
 {
     [SerializeField] private float height = 0;
     [SerializeField] private bool isWalkable;

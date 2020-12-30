@@ -5,7 +5,6 @@ using UnityEngine;
 
 public class Cell : NetworkBehaviour
 {
-    List<uint> objects = new List<uint>();
     [SerializeField] private int sortingLayer;
 
     // Getters and Setters
@@ -17,18 +16,10 @@ public class Cell : NetworkBehaviour
 
     public override void OnStartServer()
     {
-        GetCurrentChildObjects();
+      
     }
 
-    // Gets all child isometric objects in scene
-    private void GetCurrentChildObjects()
-    {
-        var isometricObjects = GetComponentsInChildren<IsometricObject>();
-        foreach (IsometricObject isometricObject in isometricObjects)
-        {
-            objects.Add(isometricObject.GetComponent<NetworkIdentity>().netId);
-        }
-    }
+
 
     #endregion
 

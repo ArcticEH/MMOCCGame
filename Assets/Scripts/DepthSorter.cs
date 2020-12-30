@@ -50,8 +50,8 @@ public class DepthSorter : MonoBehaviour
         }
 
         // Sort the last cell (selection sort doesnt handle this)
-        cells[n - 1].AssignObjectOrderLayers((n - 1) * reservedSortingLayersPerCell);
-        cells[n - 1].name = "Cell " + ( n - 1 );
+        //cells[n - 1].AssignObjectOrderLayers((n - 1) * reservedSortingLayersPerCell);
+        //cells[n - 1].name = "Cell " + ( n - 1 );
 
 
     }
