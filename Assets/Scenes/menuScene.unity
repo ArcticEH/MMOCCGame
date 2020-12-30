@@ -131,8 +131,8 @@ GameObject:
   m_Component:
   - component: {fileID: 1332716813}
   - component: {fileID: 1332716815}
-  - component: {fileID: 1332716814}
   - component: {fileID: 1332716816}
+  - component: {fileID: 1332716814}
   m_Layer: 0
   m_Name: NetworkManager
   m_TagString: Untagged
@@ -163,7 +163,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1332716812}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6b0fecffa3f624585964b0d0eb21b18e, type: 3}
+  m_Script: {fileID: 11500000, guid: 0110f245bfcfc7d459681f7bd9ebc590, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   OnClientConnected:
@@ -190,14 +190,18 @@ MonoBehaviour:
   OnServerDisconnected:
     m_PersistentCalls:
       m_Calls: []
-  Port: 7777
-  NoDelay: 1
-  Interval: 10
-  FastResend: 0
-  CongestionWindow: 1
-  SendWindowSize: 128
-  ReceiveWindowSize: 128
-  debugGUI: 0
+  port: 7777
+  maxMessageSize: 16384
+  handshakeMaxSize: 3000
+  noDelay: 1
+  sendTimeout: 5000
+  receiveTimeout: 20000
+  serverMaxMessagesPerTick: 10000
+  clientMaxMessagesPerTick: 1000
+  sslEnabled: 0
+  sslCertJson: ./cert.json
+  sslProtocols: 3072
+  _logLevels: 0
 --- !u!114 &1332716815
 MonoBehaviour:
   m_ObjectHideFlags: 0
