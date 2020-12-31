@@ -22,7 +22,7 @@ public class DepthSorter : MonoBehaviour
         int n = cells.Length;
 
         // one by one move boundary of unsorted array
-        for (int i = 0; i < n - 1; i++)
+        for (int i = 0; i < n; i++)
         {
             // find min in unsorted array
             int minindex = i;
@@ -48,11 +48,6 @@ public class DepthSorter : MonoBehaviour
             cells[i].name = "Cell " + i;
            
         }
-
-        // Sort the last cell (selection sort doesnt handle this)
-        //cells[n - 1].AssignObjectOrderLayers((n - 1) * reservedSortingLayersPerCell);
-        //cells[n - 1].name = "Cell " + ( n - 1 );
-
 
     }
 }

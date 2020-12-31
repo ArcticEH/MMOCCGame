@@ -8,6 +8,7 @@ public class MyPlayer : NetworkBehaviour
 {
 
     [SerializeField] string playerName;
+    [SyncVar] public int playerCell;
 
     #region Server
 
@@ -15,7 +16,11 @@ public class MyPlayer : NetworkBehaviour
     public override void OnStartClient()
     {
         base.OnStartClient();
-        HandleClientEnterRoom(); // Currently happens right on spawn but should happen only when entering a new room in the future
+        RpcHandleClientEnterRoom(); // Currently happens right on spawn but should happen only when entering a new room in the future
+        TargetClientSpawnOthers(connectionToClient);
+
+        print("Connection to client:");
+        Debug.Log(connectionToClient);
     }
 
     #endregion
@@ -24,12 +29,29 @@ public class MyPlayer : NetworkBehaviour
     #region Client
 
     [ClientRpc]
-    private void HandleClientEnterRoom()
+    private void RpcHandleClientEnterRoom()
     {
+        MyNetworkManager nm = FindObjectOfType<MyNetworkManager>();
         Debug.LogError("Called on Client");
         // Find spawn point in room and place in there
         var spawnPoint = FindObjectOfType<Spawn>();
         transform.parent = spawnPoint.transform;
+        GetComponent<PlayerMovement>().currentCell = spawnPoint.GetComponent<Cell>();
+    }
+
+    [TargetRpc]
+    private void TargetClientSpawnOthers(NetworkConnection connectionToClient)
+    {
+
+        Debug.LogError("changing positions of all others");
+
+
+        foreach (MyPlayer player in MyNetworkManager.Players)
+        {
+            Cell playerCell = player.GetComponent<PlayerMovement>().currentCell;
+            player.transform.position = new Vector2(0, 0);
+            player.transform.parent = playerCell.transform;
+        }
     }
 
     #endregion

@@ -7,7 +7,7 @@ using UnityEngine;
 public class MyNetworkManager : NetworkManager
 {
     // List of players
-    [SerializeField] public List<MyPlayer> Players = new List<MyPlayer>();
+    static public List<MyPlayer> Players = new List<MyPlayer>();
 
 
     // Events
