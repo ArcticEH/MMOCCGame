@@ -232,6 +232,7 @@ MonoBehaviour:
   autoCreatePlayer: 1
   playerSpawnMethod: 0
   spawnPrefabs: []
+  Players: []
 --- !u!114 &1332716816
 MonoBehaviour:
   m_ObjectHideFlags: 0

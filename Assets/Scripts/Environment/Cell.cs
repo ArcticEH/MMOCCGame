@@ -2,14 +2,22 @@
 using System.Collections.Generic;
 using Mirror;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class Cell : NetworkBehaviour
 {
     [SerializeField] private int sortingLayer;
+    [SerializeField] private bool isWalkable = true;
+    [SerializeField] private MouseHoveror mouseHoveror;
 
     // Getters and Setters
     public int GetSortingLayer() {
         return sortingLayer;
+    }
+
+    public bool GetIsWalkable()
+    {
+        return isWalkable;
     }
 
     #region Server
@@ -26,6 +34,11 @@ public class Cell : NetworkBehaviour
 
     #region Client
 
+    private void Start()
+    {
+        mouseHoveror = FindObjectOfType<MouseHoveror>();
+    }
+
     public void AssignObjectOrderLayers(int sortingLayer)
     {
         // Get all isometric objects on this cell and apply them their sorting orders
@@ -39,6 +52,20 @@ public class Cell : NetworkBehaviour
             objectNumber += 1;
         }
     }
+
+    private void OnMouseEnter()
+    {
+        Debug.Log("got here");
+        // Set current cell and turn on mouse hoveror
+        mouseHoveror.gameObject.SetActive(true);
+        mouseHoveror.SetCurrentCell(this);
+
+        // Place mouse hoeveror outline in proper spot
+        mouseHoveror.transform.parent = transform;
+        mouseHoveror.transform.position = transform.position;
+        mouseHoveror.transform.SetSiblingIndex(1);
+    }
+
 
     public Vector2 GetCoordinates()
     {

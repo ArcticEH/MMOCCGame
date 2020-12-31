@@ -29,7 +29,7 @@ public class MyPlayer : NetworkBehaviour
         Debug.LogError("Called on Client");
         // Find spawn point in room and place in there
         var spawnPoint = FindObjectOfType<Spawn>();
-        this.transform.parent = spawnPoint.transform;
+        transform.parent = spawnPoint.transform;
     }
 
     #endregion
