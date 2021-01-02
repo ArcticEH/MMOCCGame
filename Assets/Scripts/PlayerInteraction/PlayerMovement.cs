@@ -34,6 +34,7 @@ public class PlayerMovement : NetworkBehaviour
         mouseHoveror = FindObjectOfType<MouseHoveror>();
         pathfinder = FindObjectOfType<PathFinder>();
         playerAnimator = GetComponent<Animator>();
+        destinationCell = FindObjectOfType<Spawn>().GetComponent<Cell>().GetCellNumber();
     }
 
     private void Start()
@@ -43,11 +44,21 @@ public class PlayerMovement : NetworkBehaviour
         transform.SetSiblingIndex(1);
         transform.localPosition = Vector3.zero;
         currentCell = FindCellWithNumber(currentCellNumber);
+
+        // Start pathing if player is currently moving
+        if (currentCellNumber != destinationCell)
+        {
+            pathfinder.SetStartingCells(currentCell, FindCellWithNumber(destinationCell));
+            currentPath = pathfinder.GetPath();
+            if (isPathing) { return; }
+            PerformPathing();
+        }
+
     }
 
     public override void OnStartServer()
     {
-        currentCellNumber = 7;
+        currentCellNumber = FindObjectOfType<Spawn>().GetComponent<Cell>().GetCellNumber(); 
     }
 
 
@@ -82,17 +93,15 @@ public class PlayerMovement : NetworkBehaviour
     {
         Debug.Log("Handle Destiniation Cell Changed");
 
-        pathfinder.SetStartingCells(currentCell, FindCellWithNumber(newCell));
-        currentPath = pathfinder.GetPath();
-
-        //if (isPathing) { return; }
-
-        //PerformPathing();
-
-        transform.parent = FindCellWithNumber(newCell).transform;
-        transform.SetSiblingIndex(1);
-        transform.localPosition = Vector3.zero;
-        currentCell = FindCellWithNumber(currentCellNumber);
+        // For some reason, even though this is a hook - if I dont run that code as local player then it will have issues deserializing. This makes no sense since this is client side code anyways
+        // But we have to set it anyways for now...
+        if (isClient)
+        {
+            pathfinder.SetStartingCells(currentCell, FindCellWithNumber(newCell));
+            currentPath = pathfinder.GetPath();
+            if (isPathing) { return; }
+            PerformPathing();
+        }
     }
 
     public void HandleCurrentCellChanged(int oldcell, int newCell)
@@ -145,7 +154,12 @@ public class PlayerMovement : NetworkBehaviour
     {
 
         currentCell = nextCell; // set current cell here since the movement will be completed - otherwise pathfinder may still include previous cell on multiple clicks
-        //CmdSetCurrentCell(currentCell.GetCellNumber()); // Update cell number on server
+
+        if (isLocalPlayer)
+        {
+            CmdSetCurrentCell(currentCell.GetCellNumber()); // Update cell number on server
+        }
+        
         var nextCellPosition = nextCell.transform.position;
         var midPoint = (transform.position + nextCell.transform.position) / 2f;
         var hasHitMidpoint = false;
