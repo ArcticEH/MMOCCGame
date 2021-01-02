@@ -7,94 +7,97 @@ using UnityEngine.InputSystem;
 
 public class PlayerMovement : NetworkBehaviour
 {
-    float movementSpeed = 50f;
-
-    [SyncVar(hook = nameof(HandleDestinationCellChanged))] int destinationCell;
+    // Sync vars
+    [SyncVar(hook = nameof(HandleDestinationCellChanged))] int destinationCellNumber;
     [SyncVar(hook = nameof(HandleCurrentCellChanged))] int currentCellNumber;
 
-
+    // Movement
+    float movementSpeed = 50f;
     PathFinder pathfinder;
-
     public Cell currentCell;
-
     Cell nextCell;
-
     public List<Cell> currentPath;
-
     public bool isPathing = false;
-
+ 
+    // Caches
     MouseHoveror mouseHoveror;
-
-    // Cached Variables
     Animator playerAnimator;
+
+    #region Server
+
+    [Server]
+    public override void OnStartServer()
+    {
+        // Spawn player on spawn cell
+        currentCellNumber = FindObjectOfType<Spawn>().GetComponent<Cell>().GetCellNumber();
+    }
+
+    [Command]
+    public void CmdSetDestinationCell(int cellNumber)
+    {
+        // TODO:  Add some type of verification here
+        destinationCellNumber = cellNumber;
+    }
+
+    [Command]
+    public void CmdSetCurrentCell(int cellNumber)
+    {
+        // Used to sync where local player sets their cell at
+        currentCellNumber = cellNumber;
+    }
+    #endregion
+
+    #region Client
 
     private void Awake()
     {
+        // Depth sort so that client has proper cell numbering
         DepthSorter.DepthSort(FindObjectsOfType<Cell>());
+
+        // Set so that default value is spawn
+        destinationCellNumber = FindObjectOfType<Spawn>().GetComponent<Cell>().GetCellNumber();
+
+        // Set cached vars
         mouseHoveror = FindObjectOfType<MouseHoveror>();
         pathfinder = FindObjectOfType<PathFinder>();
-        playerAnimator = GetComponent<Animator>();
-        destinationCell = FindObjectOfType<Spawn>().GetComponent<Cell>().GetCellNumber();
+        playerAnimator = GetComponent<Animator>();  
     }
 
     private void Start()
     {
-        // Place where server says parent cell is
+        // Place at where server says current cell is
         transform.parent = FindCellWithNumber(currentCellNumber).transform;
         transform.SetSiblingIndex(1);
         transform.localPosition = Vector3.zero;
         currentCell = FindCellWithNumber(currentCellNumber);
 
         // Start pathing if player is currently moving
-        if (currentCellNumber != destinationCell)
+        if (currentCellNumber != destinationCellNumber)
         {
-            pathfinder.SetStartingCells(currentCell, FindCellWithNumber(destinationCell));
+            pathfinder.SetStartingCells(currentCell, FindCellWithNumber(destinationCellNumber));
             currentPath = pathfinder.GetPath();
             if (isPathing) { return; }
             PerformPathing();
         }
-
     }
 
-    public override void OnStartServer()
-    {
-        currentCellNumber = FindObjectOfType<Spawn>().GetComponent<Cell>().GetCellNumber(); 
-    }
-
-
-    [Command]
-    public void CmdSetDestinationCell(int cellNumber)
-    {
-        // TODO:  Add some type of verification here
-        destinationCell = cellNumber;
-    }
-
-    [Command]
-    public void CmdSetCurrentCell(int cellNumber)
-    {
-        // Intended use right now is to sync this so the server has an idea of where the player is at 
-        currentCellNumber = cellNumber;
-        
-    }
-
+    [ClientCallback]
     private void Update()
     {
         if (!Mouse.current.leftButton.wasPressedThisFrame) { return; }
 
-        if(!isLocalPlayer) { return;  }
+        if (!isLocalPlayer) { return; }
 
-        if (mouseHoveror.currentCell == null ) { return;  }
+        if (mouseHoveror.currentCell == null) { return; }
 
         CmdSetDestinationCell(mouseHoveror.currentCell.GetCellNumber());
         CmdSetCurrentCell(mouseHoveror.currentCell.GetCellNumber());
     }
 
+    [Client]
     public void HandleDestinationCellChanged(int oldCell, int newCell)
     {
-        Debug.Log("Handle Destiniation Cell Changed");
-
-        // For some reason, even though this is a hook - if I dont run that code as local player then it will have issues deserializing. This makes no sense since this is client side code anyways
-        // But we have to set it anyways for now...
+        // For some reason, even though this is a hook and shouldnt be run on the server I have to check if its a client otherwise it wont deserialize properly
         if (isClient)
         {
             pathfinder.SetStartingCells(currentCell, FindCellWithNumber(newCell));
@@ -104,29 +107,16 @@ public class PlayerMovement : NetworkBehaviour
         }
     }
 
+    [Client]
     public void HandleCurrentCellChanged(int oldcell, int newCell)
     {
         Debug.Log("Old current cell - " + oldcell);
         Debug.Log("Current cell changed to - " + newCell);
     }
 
-    public Cell FindCellWithNumber(int cellNumber)
-    {
-        Cell[] cells = FindObjectsOfType<Cell>();
+    #region Player Movement 
 
-        foreach (Cell cell in cells)
-        {
-            if (cell.GetCellNumber() == cellNumber)
-            {
-                return cell;
-            }
-        }
-
-        Debug.LogError("Could not find cell with number - " + cellNumber);
-        return null;
-    }
-
-
+    [Client]
     public void PerformPathing()
     {
 
@@ -149,7 +139,7 @@ public class PlayerMovement : NetworkBehaviour
         }
     }
 
-
+    [Client]
     private IEnumerator PerformMovement(Cell nextCell)
     {
 
@@ -159,7 +149,7 @@ public class PlayerMovement : NetworkBehaviour
         {
             CmdSetCurrentCell(currentCell.GetCellNumber()); // Update cell number on server
         }
-        
+
         var nextCellPosition = nextCell.transform.position;
         var midPoint = (transform.position + nextCell.transform.position) / 2f;
         var hasHitMidpoint = false;
@@ -208,9 +198,7 @@ public class PlayerMovement : NetworkBehaviour
         transform.SetSiblingIndex(1);
     }
 
-    /// <summary>
-    /// Checks if pathing should continue or if it should stop.
-    /// </summary>
+    // Checks if pathing should continue or stop
     private void CompletePath()
 
     {
@@ -226,12 +214,26 @@ public class PlayerMovement : NetworkBehaviour
 
     }
 
-    Vector3 TwoDToIso(Vector3 oldCoordinates)
+    #endregion
+
+    #endregion
+
+    #region Helper Functions
+
+    public Cell FindCellWithNumber(int cellNumber)
     {
-        var newCoordinates = new Vector2();
-        newCoordinates.x = oldCoordinates.x - oldCoordinates.y;
-        newCoordinates.y = (oldCoordinates.x + oldCoordinates.y) / 2;
-        return newCoordinates;
+        Cell[] cells = FindObjectsOfType<Cell>();
+
+        foreach (Cell cell in cells)
+        {
+            if (cell.GetCellNumber() == cellNumber)
+            {
+                return cell;
+            }
+        }
+
+        Debug.LogError("Could not find cell with number - " + cellNumber);
+        return null;
     }
 
     Cell FindCellWithCoordinates(Vector3 coordinates)
@@ -241,11 +243,39 @@ public class PlayerMovement : NetworkBehaviour
         {
             if (cell.transform.position == coordinates)
             {
-                //print("Found the new cell - " + cell.name);
                 return cell;
             }
         }
 
         return currentCell;
     }
+
+    Vector3 TwoDToIso(Vector3 oldCoordinates)
+    {
+        var newCoordinates = new Vector2();
+        newCoordinates.x = oldCoordinates.x - oldCoordinates.y;
+        newCoordinates.y = (oldCoordinates.x + oldCoordinates.y) / 2;
+        return newCoordinates;
+    }
+
+    #endregion
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
