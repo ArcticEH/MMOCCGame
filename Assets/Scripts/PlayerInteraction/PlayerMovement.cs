@@ -88,6 +88,8 @@ public class PlayerMovement : NetworkBehaviour
 
         if (!isLocalPlayer) { return; }
 
+        if (mouseHoveror.currentCell.GetIsWalkable() == false) { return; }
+
         if (mouseHoveror.currentCell == null) { return; }
 
         CmdSetDestinationCell(mouseHoveror.currentCell.GetCellNumber());

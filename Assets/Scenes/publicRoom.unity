@@ -1524,7 +1524,6 @@ MonoBehaviour:
   startCell: {fileID: 0}
   endCell: {fileID: 0}
   searchCenter: {fileID: 0}
-  path: []
 --- !u!1001 &1957336778
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1620,7 +1619,7 @@ PrefabInstance:
     - target: {fileID: 639918027986414276, guid: 03583e97dabfab24db27a8020b5c9b84,
         type: 3}
       propertyPath: sceneId
-      value: 3457523454
+      value: 3919189438
       objectReference: {fileID: 0}
     - target: {fileID: 1911255391760251532, guid: 03583e97dabfab24db27a8020b5c9b84,
         type: 3}

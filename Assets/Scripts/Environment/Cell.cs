@@ -17,6 +17,16 @@ public class Cell : MonoBehaviour
 
     public bool GetIsWalkable()
     {
+        var isometricObjects = GetComponentsInChildren<IsometricObject>();
+
+        foreach (IsometricObject obj in isometricObjects)
+        {
+            if (obj.DoesObjectBlockPath() == true)
+            {
+                isWalkable = false;
+            }
+        }
+
         return isWalkable;
     }
 
@@ -29,8 +39,8 @@ public class Cell : MonoBehaviour
     private void Start()
     {
         // Assigned cached vars
-        mouseHoveror = FindObjectOfType<MouseHoveror>();    
-    }
+        mouseHoveror = FindObjectOfType<MouseHoveror>();  
+   }
 
     public void AssignObjectOrderLayers(int sortingLayer)
     {
