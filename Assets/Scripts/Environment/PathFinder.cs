@@ -37,11 +37,6 @@ public class PathFinder : MonoBehaviour
         new Vector2((float) 28, (float) 14), // right
         new Vector2((float) -28, (float)-14) // left
 
-        //new Vector2(0, 1), // up
-        //new Vector2(0, -1), // down
-        //new Vector2(1, 0), // right
-        //new Vector2(-1, 0), // down
-
     };
 
     public void SetStartingCells(Cell startCell, Cell endCell)

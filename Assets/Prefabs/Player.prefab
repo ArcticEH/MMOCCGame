@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 2438658846549957026}
   - component: {fileID: 2438658846549957027}
   - component: {fileID: -7880275974491553655}
+  - component: {fileID: 1082153176691260922}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -65,8 +66,6 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0.1
   playerName: 
-  mouseHoveror: {fileID: 7281368513786316119, guid: 7b44a961a2a6ad5459cfc72d9f8dcca4,
-    type: 3}
 --- !u!114 &-7880275974491553655
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -86,6 +85,25 @@ MonoBehaviour:
   currentCell: {fileID: 0}
   currentPath: []
   isPathing: 0
+--- !u!95 &1082153176691260922
+Animator:
+  serializedVersion: 3
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2438658846549957024}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: cd115f26a3d36004080df2e366ebcffc, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorControllerStateOnDisable: 0
 --- !u!1 &5321044453389837020
 GameObject:
   m_ObjectHideFlags: 0
