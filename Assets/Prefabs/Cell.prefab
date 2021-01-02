@@ -62,10 +62,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 06a4af79291d5ad47b5312c800b38900, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  syncMode: 0
-  syncInterval: 0.1
   sortingLayer: 0
   isWalkable: 1
+  cellNumber: 0
   mouseHoveror: {fileID: 7281368513786316119, guid: 7b44a961a2a6ad5459cfc72d9f8dcca4,
     type: 3}
 --- !u!60 &7780787475517390664

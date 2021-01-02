@@ -17,7 +17,7 @@ public class DepthSorter : MonoBehaviour
     /// Uses a selection sort to sort cells and assigns the cells those layers within each sort cycle
     /// </summary>
     /// <param name="cells"></param>
-    static void DepthSort(Cell[] cells)
+    static public void DepthSort(Cell[] cells)
     {
         int n = cells.Length;
 
@@ -44,8 +44,6 @@ public class DepthSorter : MonoBehaviour
 
             // Assign minimum cell its sorting layer
             cells[i].AssignObjectOrderLayers(i * reservedSortingLayersPerCell);
-
-            cells[i].name = "Cell " + i;
            
         }
 

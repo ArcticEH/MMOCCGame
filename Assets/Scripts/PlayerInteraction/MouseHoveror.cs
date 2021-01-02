@@ -1,30 +1,26 @@
-﻿using System.Collections;
+﻿using Mirror;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 
 public class MouseHoveror : MonoBehaviour
 {
-    [SerializeField] IsometricObject selectionOutlinePrefab;
-    private Cell currentCell;
+    [SerializeField] public Cell currentCell;
+    [SerializeField] private CurrentCellSprite selectedCellSprite;
 
-    public void SetCurrentCell(Cell currentCell)
+    private void Start()
     {
-        this.currentCell = currentCell;
+        selectedCellSprite = FindObjectOfType<CurrentCellSprite>();
     }
 
-    private void Update()
+    public void SetCurrentCell(Cell cell)
     {
-        if(Mouse.current.leftButton.wasPressedThisFrame)
-        {
-            HandleClick();
-        }
-    }
+        currentCell = cell;
 
-    private void HandleClick()
-    {
-        Debug.Log("Mouse clicked");
+        // Place current sprite outline in cell
+        selectedCellSprite.transform.parent = cell.transform;
+        selectedCellSprite.transform.position = cell.transform.position;
+        selectedCellSprite.transform.SetSiblingIndex(1);
     }
-
 }

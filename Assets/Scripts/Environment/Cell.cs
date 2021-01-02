@@ -2,14 +2,14 @@
 using System.Collections.Generic;
 using Mirror;
 using UnityEngine;
-using UnityEngine.EventSystems;
 
-public class Cell : NetworkBehaviour
+public class Cell : MonoBehaviour
 {
     [SerializeField] private int sortingLayer;
     [SerializeField] private bool isWalkable = true;
+    [SerializeField] private int cellNumber;
     [SerializeField] private MouseHoveror mouseHoveror;
-
+    
     // Getters and Setters
     public int GetSortingLayer() {
         return sortingLayer;
@@ -20,23 +20,16 @@ public class Cell : NetworkBehaviour
         return isWalkable;
     }
 
-    #region Server
-
-    public override void OnStartServer()
+    public int GetCellNumber()
     {
-      
+        return cellNumber;
     }
 
-
-
-    #endregion
-
-
-    #region Client
-
+    
     private void Start()
     {
-        mouseHoveror = FindObjectOfType<MouseHoveror>();
+        // Assigned cached vars
+        mouseHoveror = FindObjectOfType<MouseHoveror>();    
     }
 
     public void AssignObjectOrderLayers(int sortingLayer)
@@ -50,20 +43,14 @@ public class Cell : NetworkBehaviour
             SpriteRenderer sr = obj.GetComponent<SpriteRenderer>();
             sr.sortingOrder = sortingLayer + objectNumber;
             objectNumber += 1;
+            cellNumber = sortingLayer / 10;
         }
     }
 
     private void OnMouseEnter()
     {
-        Debug.Log("got here");
-        // Set current cell and turn on mouse hoveror
-        mouseHoveror.gameObject.SetActive(true);
+        // Set current cell on mouse hoveror
         mouseHoveror.SetCurrentCell(this);
-
-        // Place mouse hoeveror outline in proper spot
-        mouseHoveror.transform.parent = transform;
-        mouseHoveror.transform.position = transform.position;
-        mouseHoveror.transform.SetSiblingIndex(1);
     }
 
 
@@ -72,5 +59,5 @@ public class Cell : NetworkBehaviour
         return new Vector2(transform.position.x, transform.position.y);
     }
 
-    #endregion
+  
 }
