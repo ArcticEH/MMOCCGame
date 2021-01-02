@@ -7,15 +7,19 @@ using UnityEngine.InputSystem;
 
 public class PlayerMovement : NetworkBehaviour
 {
-    [SerializeField] float movementSpeed = 0.5f;
+    float movementSpeed = 50f;
 
-    [SyncVar(hook = nameof(HandleCurrentCellNumberChanged))] [SerializeField] int currentCellNumber;
+    [SyncVar(hook = nameof(HandleDestinationCellChanged))] int destinationCell;
+    [SyncVar(hook = nameof(HandleCurrentCellChanged))] int currentCellNumber;
+
+
+    PathFinder pathfinder;
 
     public Cell currentCell;
 
     Cell nextCell;
 
-    public List<Cell> currentPath = new List<Cell>();
+    public List<Cell> currentPath;
 
     public bool isPathing = false;
 
@@ -28,24 +32,38 @@ public class PlayerMovement : NetworkBehaviour
     {
         DepthSorter.DepthSort(FindObjectsOfType<Cell>());
         mouseHoveror = FindObjectOfType<MouseHoveror>();
+        pathfinder = FindObjectOfType<PathFinder>();
+        playerAnimator = GetComponent<Animator>();
     }
 
-    public override void OnStartClient()
+    private void Start()
     {
-        if (!isLocalPlayer) { return; }
-        //Request to be placed at spawn
-        DepthSorter.DepthSort(FindObjectsOfType<Cell>());
+        // Place where server says parent cell is
+        transform.parent = FindCellWithNumber(currentCellNumber).transform;
+        transform.SetSiblingIndex(1);
+        transform.localPosition = Vector3.zero;
+        currentCell = FindCellWithNumber(currentCellNumber);
+    }
 
-        int spawnCellNumber = FindObjectOfType<Spawn>().GetComponent<Cell>().GetCellNumber();
-        CmdPlayerMoveToCell(spawnCellNumber);
+    public override void OnStartServer()
+    {
+        currentCellNumber = 7;
     }
 
 
     [Command]
-    public void CmdPlayerMoveToCell(int cellNumber)
+    public void CmdSetDestinationCell(int cellNumber)
     {
         // TODO:  Add some type of verification here
+        destinationCell = cellNumber;
+    }
+
+    [Command]
+    public void CmdSetCurrentCell(int cellNumber)
+    {
+        // Intended use right now is to sync this so the server has an idea of where the player is at 
         currentCellNumber = cellNumber;
+        
     }
 
     private void Update()
@@ -56,20 +74,31 @@ public class PlayerMovement : NetworkBehaviour
 
         if (mouseHoveror.currentCell == null ) { return;  }
 
-        CmdPlayerMoveToCell(mouseHoveror.currentCell.GetCellNumber());
+        CmdSetDestinationCell(mouseHoveror.currentCell.GetCellNumber());
+        CmdSetCurrentCell(mouseHoveror.currentCell.GetCellNumber());
     }
 
-    public void HandleCurrentCellNumberChanged(int oldCell, int newCell)
+    public void HandleDestinationCellChanged(int oldCell, int newCell)
     {
-        // Set cell transform
-        currentCellNumber = newCell;
+        Debug.Log("Handle Destiniation Cell Changed");
 
-        // Set player transform to new cell
-        Cell cell = FindCellWithNumber(newCell);
-        transform.parent = cell.transform;
+        pathfinder.SetStartingCells(currentCell, FindCellWithNumber(newCell));
+        currentPath = pathfinder.GetPath();
 
-        // Reset cell transform (probably shouldnt be here but testing for spawn)
+        //if (isPathing) { return; }
+
+        //PerformPathing();
+
+        transform.parent = FindCellWithNumber(newCell).transform;
+        transform.SetSiblingIndex(1);
         transform.localPosition = Vector3.zero;
+        currentCell = FindCellWithNumber(currentCellNumber);
+    }
+
+    public void HandleCurrentCellChanged(int oldcell, int newCell)
+    {
+        Debug.Log("Old current cell - " + oldcell);
+        Debug.Log("Current cell changed to - " + newCell);
     }
 
     public Cell FindCellWithNumber(int cellNumber)
@@ -88,11 +117,6 @@ public class PlayerMovement : NetworkBehaviour
         return null;
     }
 
-
-    void Start()
-    {
-        playerAnimator = GetComponent<Animator>();
-    }
 
     public void PerformPathing()
     {
@@ -121,6 +145,7 @@ public class PlayerMovement : NetworkBehaviour
     {
 
         currentCell = nextCell; // set current cell here since the movement will be completed - otherwise pathfinder may still include previous cell on multiple clicks
+        //CmdSetCurrentCell(currentCell.GetCellNumber()); // Update cell number on server
         var nextCellPosition = nextCell.transform.position;
         var midPoint = (transform.position + nextCell.transform.position) / 2f;
         var hasHitMidpoint = false;

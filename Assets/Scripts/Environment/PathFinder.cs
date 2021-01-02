@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.IO;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 public class PathFinder : MonoBehaviour
@@ -20,13 +15,13 @@ public class PathFinder : MonoBehaviour
         }
     }
 
-    [SerializeField] public Cell startCell, endCell;
+  public Cell startCell, endCell;
 
     Dictionary<Vector2, PathFinderGridCell> grid = new Dictionary<Vector2, PathFinderGridCell>();
     [SerializeField] Queue<Cell> queue = new Queue<Cell>();
     bool isRunning = false;
     [SerializeField] Cell searchCenter;
-    [SerializeField] private List<Cell> path = new List<Cell>();
+    private List<Cell> path = new List<Cell>();
 
 
 
@@ -47,6 +42,7 @@ public class PathFinder : MonoBehaviour
 
     public List<Cell> GetPath()
     {
+        Debug.Log("Getting path on client");
         CalculatePath();
         return path;
     }

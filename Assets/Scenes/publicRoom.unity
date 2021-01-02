@@ -1119,7 +1119,8 @@ PrefabInstance:
       propertyPath: m_Name
       value: mouseHoveror
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 1137527477, guid: 7b44a961a2a6ad5459cfc72d9f8dcca4, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: 7b44a961a2a6ad5459cfc72d9f8dcca4, type: 3}
 --- !u!1001 &1249858933
 PrefabInstance:
@@ -1470,6 +1471,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1926803813}
+  - component: {fileID: 1926803814}
   m_Layer: 0
   m_Name: Cells
   m_TagString: Untagged
@@ -1507,6 +1509,22 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1926803814
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1926803812}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e625b693a4ae98549b80d378db384bac, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  startCell: {fileID: 0}
+  endCell: {fileID: 0}
+  searchCenter: {fileID: 0}
+  path: []
 --- !u!1001 &1957336778
 PrefabInstance:
   m_ObjectHideFlags: 0

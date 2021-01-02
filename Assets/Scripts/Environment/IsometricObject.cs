@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class IsometricObject : MonoBehaviour
 {
-    [SerializeField] private float height = 0;
+    //[SerializeField] private float height = 0;
     [SerializeField] private bool isWalkable;
 
     #region Server
