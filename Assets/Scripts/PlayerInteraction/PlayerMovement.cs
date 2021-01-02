@@ -91,7 +91,6 @@ public class PlayerMovement : NetworkBehaviour
         if (mouseHoveror.currentCell == null) { return; }
 
         CmdSetDestinationCell(mouseHoveror.currentCell.GetCellNumber());
-        CmdSetCurrentCell(mouseHoveror.currentCell.GetCellNumber());
     }
 
     [Client]
