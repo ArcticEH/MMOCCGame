@@ -6,13 +6,13 @@ using UnityEngine;
 public class IsometricObject : MonoBehaviour
 {
     //[SerializeField] private float height = 0;
-    [SerializeField] private bool doesItBlockPath;
+    [SerializeField] private bool isWalkable;
 
     #region Server
 
     // Determines if player should be able to walk on this cell. Future implementation may consider more factors than just the variable.
-    public bool DoesObjectBlockPath() {
-        return doesItBlockPath;
+    public bool GetIsWalkable() {
+        return isWalkable;
     }
 
     #endregion

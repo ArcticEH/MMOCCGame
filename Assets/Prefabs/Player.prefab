@@ -80,10 +80,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   syncMode: 0
   syncInterval: 0.1
-  movementSpeed: 100
-  destinationCell: 0
-  pathfinder: {fileID: 0}
-  currentCellNumber: 9
   currentCell: {fileID: 0}
   currentPath: []
   isPathing: 0
@@ -201,5 +197,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 17f4aac26d6623f40a49410fac67c81b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  height: 0
-  isWalkable: 0
+  isWalkable: 1

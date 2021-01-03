@@ -6,7 +6,6 @@ using UnityEngine;
 public class Cell : MonoBehaviour
 {
     [SerializeField] private int sortingLayer;
-    [SerializeField] private bool isWalkable = true;
     [SerializeField] private int cellNumber;
     [SerializeField] private MouseHoveror mouseHoveror;
     
@@ -17,17 +16,19 @@ public class Cell : MonoBehaviour
 
     public bool GetIsWalkable()
     {
+        // Get all objects on child
         var isometricObjects = GetComponentsInChildren<IsometricObject>();
 
+        // If any objects are not walkable then return false
         foreach (IsometricObject obj in isometricObjects)
         {
-            if (obj.DoesObjectBlockPath() == true)
-            {
-                isWalkable = false;
+            if (!obj.GetIsWalkable()) {
+                Debug.Log("Return false");
+                return false; 
             }
         }
 
-        return isWalkable;
+        return true;
     }
 
     public int GetCellNumber()

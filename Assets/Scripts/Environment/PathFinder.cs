@@ -160,7 +160,7 @@ public class PathFinder : MonoBehaviour
         {
             var gridPos = cell.GetCoordinates();
 
-            if (grid.ContainsKey(gridPos) || cell.GetIsWalkable() == false)
+            if (grid.ContainsKey(gridPos) || !cell.GetIsWalkable())
             {
                 // Dont add block
             }
