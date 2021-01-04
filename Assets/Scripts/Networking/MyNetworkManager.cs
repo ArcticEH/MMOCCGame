@@ -27,6 +27,15 @@ public class MyNetworkManager : NetworkManager
         Players.Add(player);
     }
 
+    public override void OnServerDisconnect(NetworkConnection conn)
+    {
+        base.OnServerDisconnect(conn);
+
+        // Remove from list of players
+        MyPlayer player = conn.identity.GetComponent<MyPlayer>();
+        Players.Remove(player);
+    }
+
 
     #endregion
 
