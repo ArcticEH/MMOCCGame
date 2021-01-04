@@ -111,8 +111,7 @@ public class PlayerMovement : NetworkBehaviour
     [Client]
     public void HandleCurrentCellChanged(int oldcell, int newCell)
     {
-        Debug.Log("Old current cell - " + oldcell);
-        Debug.Log("Current cell changed to - " + newCell);
+        // cell changed
     }
 
     #region Player Movement 
@@ -126,8 +125,6 @@ public class PlayerMovement : NetworkBehaviour
         isPathing = true;
         nextCell = currentPath[0];
         currentPath.RemoveAt(0);
-
-        print($"Next cell - {nextCell.name}");
 
         // Determine which direction this path is in
         if (nextCell == currentCell)
