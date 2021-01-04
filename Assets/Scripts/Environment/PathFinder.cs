@@ -15,7 +15,7 @@ public class PathFinder : MonoBehaviour
         }
     }
 
-  public Cell startCell, endCell;
+    public Cell startCell, endCell;
 
     Dictionary<Vector2, PathFinderGridCell> grid = new Dictionary<Vector2, PathFinderGridCell>();
     [SerializeField] Queue<Cell> queue = new Queue<Cell>();

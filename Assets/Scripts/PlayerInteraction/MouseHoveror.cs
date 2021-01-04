@@ -7,11 +7,11 @@ using UnityEngine.InputSystem;
 public class MouseHoveror : MonoBehaviour
 {
     [SerializeField] public Cell currentCell;
-    [SerializeField] private CurrentCellSprite selectedCellSprite;
+    [SerializeField] private IsometricObject selectedCellSprite;
 
-    private void Start()
+    private void Awake()
     {
-        selectedCellSprite = FindObjectOfType<CurrentCellSprite>();
+        selectedCellSprite = FindObjectOfType<CurrentCellSprite>().GetComponent<IsometricObject>();
     }
 
     public void SetCurrentCell(Cell cell)
@@ -19,8 +19,7 @@ public class MouseHoveror : MonoBehaviour
         currentCell = cell;
 
         // Place current sprite outline in cell
-        selectedCellSprite.transform.parent = cell.transform;
-        selectedCellSprite.transform.position = cell.transform.position;
-        selectedCellSprite.transform.SetSiblingIndex(1);
+        selectedCellSprite.ChangeCell(currentCell, 1);
+        selectedCellSprite.transform.position = selectedCellSprite.myCell.transform.position;
     }
 }

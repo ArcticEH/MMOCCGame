@@ -43,7 +43,7 @@ public class DepthSorter : MonoBehaviour
             cells[i] = temp;
 
             // Assign minimum cell its sorting layer
-            cells[i].AssignObjectOrderLayers(i * reservedSortingLayersPerCell);
+            //cells[i].AssignObjectOrderLayers(i * reservedSortingLayersPerCell);
            
         }
 

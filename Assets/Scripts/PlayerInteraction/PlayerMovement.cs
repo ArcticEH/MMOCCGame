@@ -12,16 +12,17 @@ public class PlayerMovement : NetworkBehaviour
     [SyncVar(hook = nameof(HandleCurrentCellChanged))] int currentCellNumber;
 
     // Movement
-    float movementSpeed = 50f;
+    [SerializeField] float movementSpeed = 50f;
     PathFinder pathfinder;
     public Cell currentCell;
     Cell nextCell;
     public List<Cell> currentPath;
     public bool isPathing = false;
- 
+
     // Caches
     MouseHoveror mouseHoveror;
     Animator playerAnimator;
+    IsometricObject isometricObject;
 
     #region Server
 
@@ -29,7 +30,7 @@ public class PlayerMovement : NetworkBehaviour
     public override void OnStartServer()
     {
         // Spawn player on spawn cell
-        currentCellNumber = FindObjectOfType<Spawn>().GetComponent<Cell>().GetCellNumber();
+        currentCellNumber = FindObjectOfType<Spawn>().GetComponent<IsometricObject>().myCell.GetCellNumber();
     }
 
     [Command]
@@ -55,21 +56,21 @@ public class PlayerMovement : NetworkBehaviour
         DepthSorter.DepthSort(FindObjectsOfType<Cell>());
 
         // Set so that default value is spawn
-        destinationCellNumber = FindObjectOfType<Spawn>().GetComponent<Cell>().GetCellNumber();
+        destinationCellNumber = FindObjectOfType<Spawn>().GetComponent<IsometricObject>().myCell.GetCellNumber();
 
         // Set cached vars
         mouseHoveror = FindObjectOfType<MouseHoveror>();
         pathfinder = FindObjectOfType<PathFinder>();
-        playerAnimator = GetComponent<Animator>();  
+        playerAnimator = GetComponent<Animator>();
+        isometricObject = GetComponentInChildren<IsometricObject>();
     }
 
     private void Start()
     {
         // Place at where server says current cell is
-        transform.parent = FindCellWithNumber(currentCellNumber).transform;
-        transform.SetSiblingIndex(1);
-        transform.localPosition = Vector3.zero;
         currentCell = FindCellWithNumber(currentCellNumber);
+        isometricObject.ChangeCell(currentCell);
+        isometricObject.transform.position = isometricObject.myCell.transform.position;
 
         // Start pathing if player is currently moving
         if (currentCellNumber != destinationCellNumber)
@@ -152,52 +153,52 @@ public class PlayerMovement : NetworkBehaviour
         }
 
         var nextCellPosition = nextCell.transform.position;
-        var midPoint = (transform.position + nextCell.transform.position) / 2f;
+        var midPoint = (isometricObject.transform.position + nextCell.transform.position) / 2f;
         var hasHitMidpoint = false;
-        var midwayPoint = Vector3.Distance(transform.position, nextCellPosition) / 2;
+        var midwayPoint = Vector3.Distance(isometricObject.transform.position, nextCellPosition) / 2;
 
         // Animation Triggers
-        if ((transform.position.x > nextCellPosition.x) && transform.position.y > nextCellPosition.y) // LEFT
+        if ((isometricObject.transform.position.x > nextCellPosition.x) && isometricObject.transform.position.y > nextCellPosition.y) // LEFT
         {
             playerAnimator.SetTrigger("faceLeft");
         }
-        else if ((transform.position.x < nextCellPosition.x) && transform.position.y > nextCellPosition.y) // DOWN
+        else if ((isometricObject.transform.position.x < nextCellPosition.x) && isometricObject.transform.position.y > nextCellPosition.y) // DOWN
         {
             playerAnimator.SetTrigger("faceDown");
         }
-        else if ((transform.position.x > nextCellPosition.x) && transform.position.y < nextCellPosition.y) // UP
+        else if ((isometricObject.transform.position.x > nextCellPosition.x) && isometricObject.transform.position.y < nextCellPosition.y) // UP
         {
             playerAnimator.SetTrigger("faceUp");
         }
-        else if ((transform.position.x < nextCellPosition.x) && transform.position.y < nextCellPosition.y) // RIGHT
+        else if ((isometricObject.transform.position.x < nextCellPosition.x) && isometricObject.transform.position.y < nextCellPosition.y) // RIGHT
         {
             playerAnimator.SetTrigger("faceRight");
         }
 
 
-        while (transform.position != nextCellPosition)
+        while (isometricObject.transform.position != nextCellPosition)
         {
             // Check if player has past midpoint, once they have then move them to the new cell
-            if ((Vector3.Distance(transform.position, nextCellPosition) < midwayPoint) && (hasHitMidpoint == false))
+            if ((Vector3.Distance(isometricObject.transform.position, nextCellPosition) < midwayPoint) && (hasHitMidpoint == false))
             {
-                MoveToCell();
+                isometricObject.ChangeCell(nextCell, 1);
                 hasHitMidpoint = true;
             }
 
-            var nextPosition = Vector3.MoveTowards(transform.position, nextCell.transform.position, movementSpeed * Time.deltaTime);
-            transform.position = nextPosition;
+            var nextPosition = Vector3.MoveTowards(isometricObject.transform.position, nextCell.transform.position, movementSpeed * Time.deltaTime);
+            isometricObject.transform.position = nextPosition;
             yield return null;
         }
 
-        MoveToCell(); // for sprite sorting this should happen halfway through
+        isometricObject.ChangeCell(nextCell, 1); // for sprite sorting this should happen halfway through
         CompletePath();
     }
 
-    private void MoveToCell()
-    {
-        transform.parent = nextCell.transform;
-        transform.SetSiblingIndex(1);
-    }
+    //private void MoveToCell()
+    //{
+    //    transform.parent = nextCell.transform;
+    //    transform.SetSiblingIndex(1);
+    //}
 
     // Checks if pathing should continue or stop
     private void CompletePath()
@@ -260,23 +261,5 @@ public class PlayerMovement : NetworkBehaviour
     }
 
     #endregion
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 }

@@ -7,17 +7,67 @@ public class IsometricObject : MonoBehaviour
 {
     //[SerializeField] private float height = 0;
     [SerializeField] private bool isWalkable;
+    [SerializeField] public int cellNumber;
 
-    #region Server
+    [SerializeField] public Cell myCell;
 
-    // Determines if player should be able to walk on this cell. Future implementation may consider more factors than just the variable.
-    public bool GetIsWalkable() {
-        return isWalkable;
+    // Cached
+    [SerializeField] public Cells Cells;
+
+    #region Client
+
+    private void Start()
+    {
+        // Assign cached variables
+        Cells = FindObjectOfType<Cells>();
+
+
+        // Find out what cell this object is on
+        myCell = FindMyCell();
+        myCell.objectsInCell.Add(this);
     }
+
+    public void ChangeCell(Cell newCell, int index = -1)
+    {
+        // Remove from current cell 
+        myCell.objectsInCell.Remove(this);
+
+        // Set new cell
+        myCell = newCell;
+
+        // Add at specified index
+        if (index == -1)
+            newCell.objectsInCell.Add(this);
+        else
+            newCell.objectsInCell.Insert(index, this);
+    }
+
+
 
     #endregion
 
-    #region Client
+    #region Helper
+
+    public Cell FindMyCell()
+    {
+        foreach(Cell cell in Cells.cells)
+        {
+            if (cell.transform.position == this.transform.position)
+            {
+                return cell;
+            }
+        }
+
+        // Error since we could not find cell
+        throw new System.Exception("Error finding cell for isometric object - " + gameObject.name);
+    }
+
+    // Determines if player should be able to walk on this cell. Future implementation may consider more factors than just the variable.
+    public bool GetIsWalkable()
+    {
+        return isWalkable;
+    }
+
     #endregion
 
 }
