@@ -117,10 +117,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   syncMode: 0
   syncInterval: 0.1
-  chatbarText: {fileID: 0}
   chatBubble: {fileID: 6739801880370705923, guid: 3de87043c67858b4ca44975fdae24a3c,
     type: 3}
-  chatCanvas: {fileID: 0}
+  playerMovement: {fileID: -7880275974491553655}
 --- !u!1 &5321044453389837020
 GameObject:
   m_ObjectHideFlags: 0

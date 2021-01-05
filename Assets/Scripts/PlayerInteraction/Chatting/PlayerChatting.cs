@@ -10,6 +10,7 @@ public class PlayerChatting : NetworkBehaviour
 {
     InputField chatbarText;
     [SerializeField] GameObject chatBubble;
+    [SerializeField] PlayerMovement playerMovement;
     ChatLogCanvas chatLogCanvas;
 
     public static event Action ClientOnReceivedMessage;
@@ -17,9 +18,9 @@ public class PlayerChatting : NetworkBehaviour
     #region Server
     
     [Command]
-    public void CmdSendMessage(string message)
+    public void CmdSendMessage(string message, Vector3 cellPosition)
     { 
-        RpcHandleReceivedMessage(message);
+        RpcHandleReceivedMessage(message, cellPosition);
     }
 
     #endregion
@@ -35,7 +36,7 @@ public class PlayerChatting : NetworkBehaviour
 
         if (!isLocalPlayer) { return; }
 
-        CmdSendMessage(chatbarText.text);
+        CmdSendMessage(chatbarText.text, playerMovement.currentCell.transform.position);
 
         chatbarText.text = string.Empty;
     }
@@ -50,9 +51,16 @@ public class PlayerChatting : NetworkBehaviour
     }
 
     [ClientRpc]
-    public void RpcHandleReceivedMessage(string message)
+    public void RpcHandleReceivedMessage(string message, Vector3 cellPosition)
     {
+
+        var screenPosition = Camera.main.WorldToScreenPoint(cellPosition);
+
+        screenPosition.y = Screen.height * 2 / 3;
+        
         var newMessage = Instantiate(chatBubble, chatLogCanvas.transform);
+
+        newMessage.transform.position = screenPosition;
 
         newMessage.GetComponentInChildren<Text>().text = message;
 
