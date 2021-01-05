@@ -8,8 +8,8 @@ using UnityEngine.InputSystem;
 public class PlayerMovement : NetworkBehaviour
 {
     // Sync vars
-    [SyncVar(hook = nameof(HandleDestinationCellChanged))] int destinationCellNumber;
-    [SyncVar(hook = nameof(HandleCurrentCellChanged))] int currentCellNumber;
+    [SerializeField] [SyncVar(hook = nameof(HandleDestinationCellChanged))] int destinationCellNumber;
+    [SerializeField] [SyncVar(hook = nameof(HandleCurrentCellChanged))] int currentCellNumber;
 
     // Movement
     [SerializeField] float movementSpeed = 50f;
@@ -20,9 +20,9 @@ public class PlayerMovement : NetworkBehaviour
     public bool isPathing = false;
 
     // Caches
-    MouseHoveror mouseHoveror;
+    [SerializeField] MouseHoveror mouseHoveror;
     Animator playerAnimator;
-    IsometricObject isometricObject;
+    CellObject cellObject;
 
     #region Server
 
@@ -30,7 +30,7 @@ public class PlayerMovement : NetworkBehaviour
     public override void OnStartServer()
     {
         // Spawn player on spawn cell
-        currentCellNumber = FindObjectOfType<Spawn>().GetComponent<IsometricObject>().myCell.GetCellNumber();
+        currentCellNumber = FindObjectOfType<Spawn>().GetComponentInChildren<IsometricObject>().myCell.cellNumber;
     }
 
     [Command]
@@ -56,21 +56,21 @@ public class PlayerMovement : NetworkBehaviour
         DepthSorter.DepthSort(FindObjectsOfType<Cell>());
 
         // Set so that default value is spawn
-        destinationCellNumber = FindObjectOfType<Spawn>().GetComponent<IsometricObject>().myCell.GetCellNumber();
+        destinationCellNumber = FindObjectOfType<Spawn>().GetComponentInChildren<IsometricObject>().myCell.GetCellNumber();
 
         // Set cached vars
         mouseHoveror = FindObjectOfType<MouseHoveror>();
         pathfinder = FindObjectOfType<PathFinder>();
         playerAnimator = GetComponent<Animator>();
-        isometricObject = GetComponentInChildren<IsometricObject>();
+        cellObject = GetComponent<CellObject>();
     }
 
     private void Start()
     {
         // Place at where server says current cell is
         currentCell = FindCellWithNumber(currentCellNumber);
-        isometricObject.ChangeCell(currentCell);
-        isometricObject.transform.position = isometricObject.myCell.transform.position;
+        cellObject.UpdateCell(currentCell);
+        cellObject.FixPositionToCell();
 
         // Start pathing if player is currently moving
         if (currentCellNumber != destinationCellNumber)
@@ -85,6 +85,7 @@ public class PlayerMovement : NetworkBehaviour
     [ClientCallback]
     private void Update()
     {
+        
         if (!Mouse.current.leftButton.wasPressedThisFrame) { return; }
 
         if (!isLocalPlayer) { return; }
@@ -92,6 +93,8 @@ public class PlayerMovement : NetworkBehaviour
         if (!mouseHoveror.currentCell.GetIsWalkable()) { return; }
 
         if (mouseHoveror.currentCell == null) { return; }
+
+        
 
         CmdSetDestinationCell(mouseHoveror.currentCell.GetCellNumber());
     }
@@ -153,44 +156,45 @@ public class PlayerMovement : NetworkBehaviour
         }
 
         var nextCellPosition = nextCell.transform.position;
-        var midPoint = (isometricObject.transform.position + nextCell.transform.position) / 2f;
+        var midPoint = (transform.position + nextCell.transform.position) / 2f;
         var hasHitMidpoint = false;
-        var midwayPoint = Vector3.Distance(isometricObject.transform.position, nextCellPosition) / 2;
+        var midwayPoint = Vector3.Distance(transform.position, nextCellPosition) / 2;
 
         // Animation Triggers
-        if ((isometricObject.transform.position.x > nextCellPosition.x) && isometricObject.transform.position.y > nextCellPosition.y) // LEFT
+        if ((transform.position.x > nextCellPosition.x) && transform.position.y > nextCellPosition.y) // LEFT
         {
             playerAnimator.SetTrigger("faceLeft");
         }
-        else if ((isometricObject.transform.position.x < nextCellPosition.x) && isometricObject.transform.position.y > nextCellPosition.y) // DOWN
+        else if ((transform.position.x < nextCellPosition.x) && transform.position.y > nextCellPosition.y) // DOWN
         {
             playerAnimator.SetTrigger("faceDown");
         }
-        else if ((isometricObject.transform.position.x > nextCellPosition.x) && isometricObject.transform.position.y < nextCellPosition.y) // UP
+        else if ((transform.position.x > nextCellPosition.x) && transform.position.y < nextCellPosition.y) // UP
         {
             playerAnimator.SetTrigger("faceUp");
         }
-        else if ((isometricObject.transform.position.x < nextCellPosition.x) && isometricObject.transform.position.y < nextCellPosition.y) // RIGHT
+        else if ((transform.position.x < nextCellPosition.x) && transform.position.y < nextCellPosition.y) // RIGHT
         {
             playerAnimator.SetTrigger("faceRight");
         }
 
 
-        while (isometricObject.transform.position != nextCellPosition)
+        while (transform.position != nextCellPosition)
         {
             // Check if player has past midpoint, once they have then move them to the new cell
-            if ((Vector3.Distance(isometricObject.transform.position, nextCellPosition) < midwayPoint) && (hasHitMidpoint == false))
+            if ((Vector3.Distance(transform.position, nextCellPosition) < midwayPoint) && (hasHitMidpoint == false))
             {
-                isometricObject.ChangeCell(nextCell, 1);
+                cellObject.UpdateCell(nextCell, 1);
                 hasHitMidpoint = true;
             }
 
-            var nextPosition = Vector3.MoveTowards(isometricObject.transform.position, nextCell.transform.position, movementSpeed * Time.deltaTime);
-            isometricObject.transform.position = nextPosition;
+            var nextPosition = Vector3.MoveTowards(transform.position, nextCell.transform.position, movementSpeed * Time.deltaTime);
+            transform.position = nextPosition;
             yield return null;
         }
 
-        isometricObject.ChangeCell(nextCell, 1); // for sprite sorting this should happen halfway through
+        cellObject.UpdateCell(nextCell, 1); // for sprite sorting this should happen halfway through
+        cellObject.FixPositionToCell();
         CompletePath();
     }
 

@@ -21,13 +21,12 @@ public class IsometricObject : MonoBehaviour
         // Assign cached variables
         Cells = FindObjectOfType<Cells>();
 
-
         // Find out what cell this object is on
         myCell = FindMyCell();
         myCell.objectsInCell.Add(this);
     }
 
-    public void ChangeCell(Cell newCell, int index = -1)
+    public void UpdateCell(Cell newCell, int index)
     {
         // Remove from current cell 
         myCell.objectsInCell.Remove(this);
@@ -37,11 +36,10 @@ public class IsometricObject : MonoBehaviour
 
         // Add at specified index
         if (index == -1)
-            newCell.objectsInCell.Add(this);
+            myCell.objectsInCell.Add(this);
         else
-            newCell.objectsInCell.Insert(index, this);
+            myCell.objectsInCell.Insert(index, this);
     }
-
 
 
     #endregion
