@@ -4,12 +4,15 @@ using UnityEngine;
 using Mirror;
 using UnityEngine.UI;
 using UnityEngine.InputSystem;
+using System;
 
 public class PlayerChatting : NetworkBehaviour
 {
     InputField chatbarText;
     [SerializeField] GameObject chatBubble;
     ChatLogCanvas chatLogCanvas;
+
+    public static event Action ClientOnReceivedMessage;
 
     #region Server
     
@@ -43,7 +46,6 @@ public class PlayerChatting : NetworkBehaviour
         base.OnStartClient();
 
         chatbarText = FindObjectOfType<Chatbar>().GetComponent<InputField>();
-        
         chatLogCanvas = FindObjectOfType<ChatLogCanvas>();
     }
 
@@ -53,6 +55,8 @@ public class PlayerChatting : NetworkBehaviour
         var newMessage = Instantiate(chatBubble, chatLogCanvas.transform);
 
         newMessage.GetComponentInChildren<Text>().text = message;
+
+        ClientOnReceivedMessage?.Invoke();
     }
 
     #endregion
