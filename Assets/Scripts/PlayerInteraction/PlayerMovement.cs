@@ -8,20 +8,21 @@ using UnityEngine.InputSystem;
 public class PlayerMovement : NetworkBehaviour
 {
     // Sync vars
-    [SyncVar(hook = nameof(HandleDestinationCellChanged))] int destinationCellNumber;
-    [SyncVar(hook = nameof(HandleCurrentCellChanged))] int currentCellNumber;
+    [SerializeField] [SyncVar(hook = nameof(HandleDestinationCellChanged))] int destinationCellNumber;
+    [SerializeField] [SyncVar(hook = nameof(HandleCurrentCellChanged))] int currentCellNumber;
 
     // Movement
-    float movementSpeed = 50f;
+    [SerializeField] float movementSpeed = 50f;
     PathFinder pathfinder;
     public Cell currentCell;
     Cell nextCell;
     public List<Cell> currentPath;
     public bool isPathing = false;
- 
+
     // Caches
-    MouseHoveror mouseHoveror;
+    [SerializeField] MouseHoveror mouseHoveror;
     Animator playerAnimator;
+    CellObject cellObject;
 
     #region Server
 
@@ -29,7 +30,7 @@ public class PlayerMovement : NetworkBehaviour
     public override void OnStartServer()
     {
         // Spawn player on spawn cell
-        currentCellNumber = FindObjectOfType<Spawn>().GetComponent<Cell>().GetCellNumber();
+        currentCellNumber = FindObjectOfType<Spawn>().GetComponentInChildren<IsometricObject>().myCell.cellNumber;
     }
 
     [Command]
@@ -55,21 +56,21 @@ public class PlayerMovement : NetworkBehaviour
         DepthSorter.DepthSort(FindObjectsOfType<Cell>());
 
         // Set so that default value is spawn
-        destinationCellNumber = FindObjectOfType<Spawn>().GetComponent<Cell>().GetCellNumber();
+        destinationCellNumber = FindObjectOfType<Spawn>().GetComponentInChildren<IsometricObject>().myCell.GetCellNumber();
 
         // Set cached vars
         mouseHoveror = FindObjectOfType<MouseHoveror>();
         pathfinder = FindObjectOfType<PathFinder>();
-        playerAnimator = GetComponent<Animator>();  
+        playerAnimator = GetComponent<Animator>();
+        cellObject = GetComponent<CellObject>();
     }
 
     private void Start()
     {
         // Place at where server says current cell is
-        transform.parent = FindCellWithNumber(currentCellNumber).transform;
-        transform.SetSiblingIndex(1);
-        transform.localPosition = Vector3.zero;
         currentCell = FindCellWithNumber(currentCellNumber);
+        cellObject.UpdateCell(currentCell);
+        cellObject.FixPositionToCell();
 
         // Start pathing if player is currently moving
         if (currentCellNumber != destinationCellNumber)
@@ -84,6 +85,7 @@ public class PlayerMovement : NetworkBehaviour
     [ClientCallback]
     private void Update()
     {
+        
         if (!Mouse.current.leftButton.wasPressedThisFrame) { return; }
 
         if (!isLocalPlayer) { return; }
@@ -91,6 +93,8 @@ public class PlayerMovement : NetworkBehaviour
         if (!mouseHoveror.currentCell.GetIsWalkable()) { return; }
 
         if (mouseHoveror.currentCell == null) { return; }
+
+        
 
         CmdSetDestinationCell(mouseHoveror.currentCell.GetCellNumber());
     }
@@ -177,7 +181,7 @@ public class PlayerMovement : NetworkBehaviour
             // Check if player has past midpoint, once they have then move them to the new cell
             if ((Vector3.Distance(transform.position, nextCellPosition) < midwayPoint) && (hasHitMidpoint == false))
             {
-                MoveToCell();
+                cellObject.UpdateCell(nextCell, 1);
                 hasHitMidpoint = true;
             }
 
@@ -186,15 +190,16 @@ public class PlayerMovement : NetworkBehaviour
             yield return null;
         }
 
-        MoveToCell(); // for sprite sorting this should happen halfway through
+        cellObject.UpdateCell(nextCell, 1); // for sprite sorting this should happen halfway through
+        cellObject.FixPositionToCell();
         CompletePath();
     }
 
-    private void MoveToCell()
-    {
-        transform.parent = nextCell.transform;
-        transform.SetSiblingIndex(1);
-    }
+    //private void MoveToCell()
+    //{
+    //    transform.parent = nextCell.transform;
+    //    transform.SetSiblingIndex(1);
+    //}
 
     // Checks if pathing should continue or stop
     private void CompletePath()
@@ -257,23 +262,5 @@ public class PlayerMovement : NetworkBehaviour
     }
 
     #endregion
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 }

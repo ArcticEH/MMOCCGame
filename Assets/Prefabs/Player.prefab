@@ -9,11 +9,12 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2438658846549957037}
+  - component: {fileID: 1082153176691260922}
   - component: {fileID: 2438658846549957026}
   - component: {fileID: 2438658846549957027}
   - component: {fileID: -7880275974491553655}
-  - component: {fileID: 1082153176691260922}
-  - component: {fileID: 1568603559150378256}
+  - component: {fileID: 3821686521398991521}
+  - component: {fileID: 691233752388718995}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -36,6 +37,25 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!95 &1082153176691260922
+Animator:
+  serializedVersion: 3
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2438658846549957024}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: cd115f26a3d36004080df2e366ebcffc, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorControllerStateOnDisable: 0
 --- !u!114 &2438658846549957026
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -81,29 +101,28 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   syncMode: 0
   syncInterval: 0.1
+  destinationCellNumber: 0
+  currentCellNumber: 0
+  movementSpeed: 75
   currentCell: {fileID: 0}
   currentPath: []
   isPathing: 0
---- !u!95 &1082153176691260922
-Animator:
-  serializedVersion: 3
+  mouseHoveror: {fileID: 0}
+--- !u!114 &3821686521398991521
+MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2438658846549957024}
   m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: cd115f26a3d36004080df2e366ebcffc, type: 2}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorControllerStateOnDisable: 0
---- !u!114 &1568603559150378256
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5583120e77cd2b04dba7ed09968ea32c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  myIsometricObjects: []
+  myCell: {fileID: 0}
+--- !u!114 &691233752388718995
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -216,3 +235,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isWalkable: 1
+  cellNumber: 0
+  myCell: {fileID: 0}
+  Cells: {fileID: 0}
