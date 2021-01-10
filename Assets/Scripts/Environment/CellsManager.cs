@@ -22,14 +22,6 @@ public class CellsManager : MonoBehaviour
 
     #region Helper
 
-    // Used currently to ensure start is run late (After all starts without the init coroutine)
-    IEnumerator InitCoroutine()
-    {
-        yield return new WaitForEndOfFrame();
-        // Find all cells in scene  
-        cells = FindObjectsOfType<Cell>().ToList();
-        DepthSort();
-    }
 
     /// <summary>
     /// Uses a selection sort to sort cells and assigns the cells those layers within each sort cycle

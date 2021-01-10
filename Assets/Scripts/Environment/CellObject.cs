@@ -18,10 +18,20 @@ public class CellObject : NetworkBehaviour
         {
             foreach (IsometricObject io in myIsometricObjects)
             {
-                io.UpdateCell(myCell);
+                io.UpdateCell(amountYRaised);
             }
         }
 
+    }
+
+    public void UpdateCell(int index = -1)
+    {
+        myCell = null; // TODO: Pick cell based off what cell was actually clicked (base cell for a multi-celled object)
+        // Update cells for all children
+        foreach (IsometricObject io in myIsometricObjects)
+        {
+            io.UpdateCell(amountYRaised, index);
+        }
     }
 
     public void UpdateCell(Cell newCell, int index = -1)

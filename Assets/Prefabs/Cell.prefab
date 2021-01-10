@@ -142,7 +142,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   height: 0
-  isWalkable: 0
+  isWalkable: 1
   cellNumber: 0
   myCell: {fileID: 174477257112795489}
   cellIndex: 0
