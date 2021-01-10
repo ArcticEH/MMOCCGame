@@ -10,6 +10,10 @@ public class Cell: MonoBehaviour
     [SerializeField] private MouseHoveror mouseHoveror;
     [SerializeField] public List<IsometricObject> objectsInCell = new List<IsometricObject>();
 
+    private void Awake()
+    {
+        // does nothing
+    }
 
     private void Start()
     {
@@ -67,35 +71,9 @@ public class Cell: MonoBehaviour
         mouseHoveror.SetCurrentCell(this);
     }
 
-
-
-
-
-
-
-
-
-
-    // [SerializeField] private int sortingLayer;
-    // [SerializeField] private int cellNumber;
-    // [SerializeField] private MouseHoveror mouseHoveror;
-
-    // // Getters and Setters
-    // public int GetSortingLayer() {
-    //     return sortingLayer;
-    // }
-
-
-
-
-
-
-
-
-
-
-
-
-
+    private void OnMouseExit()
+    {
+        mouseHoveror.RemoveFromCell();
+    }
 
 }

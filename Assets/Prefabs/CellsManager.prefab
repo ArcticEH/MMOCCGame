@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 1017725344027723874}
   - component: {fileID: 1017725344027723872}
   - component: {fileID: 8449922276195863350}
+  - component: {fileID: 754058050}
   m_Layer: 0
   m_Name: Cells
   m_TagString: Untagged
@@ -63,3 +64,15 @@ MonoBehaviour:
   startCell: {fileID: 0}
   endCell: {fileID: 0}
   searchCenter: {fileID: 0}
+--- !u!114 &754058050
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1017725344027723875}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0442458094568524b90dcb1dcf08b092, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

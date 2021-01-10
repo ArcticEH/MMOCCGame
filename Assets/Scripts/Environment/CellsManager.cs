@@ -1,8 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
-public class Cells : MonoBehaviour
+public class CellsManager : MonoBehaviour
 {
     [SerializeField] Cell cellPrefab;
     [SerializeField] public List<Cell> cells;
@@ -10,29 +11,35 @@ public class Cells : MonoBehaviour
 
     private void Start()
     {
-        // Find all ground tiles in scene
-        GameObject[] groundTiles = GameObject.FindGameObjectsWithTag("Ground");
+        StartCoroutine(InitCoroutine());
 
-        // Each ground tile indicates a new cell
-        foreach (GameObject groundTile in groundTiles)
-        {
-            Cell cell = Instantiate(cellPrefab, groundTile.transform.position, Quaternion.identity, this.transform);
-            cells.Add(cell);
-        }
  
     }
 
     private void Update()
     {
-        DepthSort(cells);
+        if (cells.Count == 0)
+            cells = FindObjectsOfType<Cell>().ToList();
+
+        DepthSort();
     }
 
     #region Helper
+
+    // Used currently to ensure start is run late (After all starts without the init coroutine)
+    IEnumerator InitCoroutine()
+    {
+        yield return new WaitForEndOfFrame();
+        // Find all cells in scene  
+        cells = FindObjectsOfType<Cell>().ToList();
+        DepthSort();
+    }
+
     /// <summary>
     /// Uses a selection sort to sort cells and assigns the cells those layers within each sort cycle
     /// </summary>
     /// <param name="cells"></param>
-    private void DepthSort(List<Cell> cells)
+    public void DepthSort()
     {
         int n = cells.Count;
 

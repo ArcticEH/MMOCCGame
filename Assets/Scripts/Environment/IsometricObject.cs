@@ -5,31 +5,38 @@ using UnityEngine;
 
 public class IsometricObject : MonoBehaviour
 {
-    //[SerializeField] private float height = 0;
+    [SerializeField] private float height = 0; // Specified by artist when deciding how items should be placed atop
     [SerializeField] private bool isWalkable;
     [SerializeField] public int cellNumber;
 
     [SerializeField] public Cell myCell;
+    [SerializeField] public int cellIndex;
 
     // Cached
-    [SerializeField] public Cells Cells;
+    [SerializeField] public CellsManager Cells;
 
-    #region Client
+    #region Getters and Setters
+
+    public float GetHeight()
+    {
+        return height;
+    }
+
+    #endregion
+
 
     private void Start()
     {
         // Assign cached variables
-        Cells = FindObjectOfType<Cells>();
+        Cells = FindObjectOfType<CellsManager>();
 
-        // Find out what cell this object is on
-        myCell = FindMyCell();
-        myCell.objectsInCell.Add(this);
     }
 
-    public void UpdateCell(Cell newCell, int index)
+    public void UpdateCell(Cell newCell, int index = -1)
     {
-        // Remove from current cell 
-        myCell.objectsInCell.Remove(this);
+        // Remove from current cell if there is a cell
+        if (myCell != null)
+            myCell.objectsInCell.Remove(this);
 
         // Set new cell
         myCell = newCell;
@@ -41,24 +48,29 @@ public class IsometricObject : MonoBehaviour
             myCell.objectsInCell.Insert(index, this);
     }
 
+    public void RemoveFromCell()
+    {
+        if (myCell == null) { return;  }
 
-    #endregion
+        myCell.objectsInCell.Remove(this);
+    }
+
 
     #region Helper
 
-    public Cell FindMyCell()
-    {
-        foreach(Cell cell in Cells.cells)
-        {
-            if (cell.transform.position == this.transform.position)
-            {
-                return cell;
-            }
-        }
+    //public Cell FindMyCell()
+    //{
+    //    foreach(Cell cell in Cells.cells)
+    //    {
+    //        if (cell.transform.position == this.transform.position)
+    //        {
+    //            return cell;
+    //        }
+    //    }
 
-        // Error since we could not find cell
-        throw new System.Exception("Error finding cell for isometric object - " + gameObject.name);
-    }
+    //    // Error since we could not find cell
+    //    throw new System.Exception("Error finding cell for isometric object - " + gameObject.name);
+    //}
 
     // Determines if player should be able to walk on this cell. Future implementation may consider more factors than just the variable.
     public bool GetIsWalkable()

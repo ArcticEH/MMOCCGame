@@ -19,7 +19,17 @@ public class MouseHoveror : MonoBehaviour
         currentCell = cell;
 
         // Place current sprite outline in cell
-        selectedCellSprite.UpdateCell(cell, 1);
+        selectedCellSprite.UpdateCell(cell);
         selectedCellSprite.FixPositionToCell();
+        selectedCellSprite.gameObject.SetActive(true);
     }
+
+    public void RemoveFromCell()
+    {
+        currentCell = null;
+        selectedCellSprite.RemoveFromCell();
+        selectedCellSprite.gameObject.SetActive(false);
+        
+    }
+
 }

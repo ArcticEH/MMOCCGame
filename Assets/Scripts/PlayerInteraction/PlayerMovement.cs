@@ -21,6 +21,7 @@ public class PlayerMovement : NetworkBehaviour
 
     // Caches
     [SerializeField] MouseHoveror mouseHoveror;
+    CellsManager cellsManager;
     Animator playerAnimator;
     CellObject cellObject;
 
@@ -30,7 +31,13 @@ public class PlayerMovement : NetworkBehaviour
     public override void OnStartServer()
     {
         // Spawn player on spawn cell
-        currentCellNumber = FindObjectOfType<Spawn>().GetComponentInChildren<IsometricObject>().myCell.cellNumber;
+        currentCellNumber = FindObjectOfType<Spawn>().GetComponent<Cell>().cellNumber;
+    }
+
+    public override void OnStopServer()
+    {
+        // Remove player from its cell
+        cellObject.RemoveFromCell();
     }
 
     [Command]
@@ -52,11 +59,13 @@ public class PlayerMovement : NetworkBehaviour
 
     private void Awake()
     {
+        cellsManager = FindObjectOfType<CellsManager>();
+
         // Depth sort so that client has proper cell numbering
-        DepthSorter.DepthSort(FindObjectsOfType<Cell>());
+        cellsManager.DepthSort();
 
         // Set so that default value is spawn
-        destinationCellNumber = FindObjectOfType<Spawn>().GetComponentInChildren<IsometricObject>().myCell.GetCellNumber();
+        destinationCellNumber = FindObjectOfType<Spawn>().GetComponent<Cell>().cellNumber;
 
         // Set cached vars
         mouseHoveror = FindObjectOfType<MouseHoveror>();
@@ -90,11 +99,9 @@ public class PlayerMovement : NetworkBehaviour
 
         if (!isLocalPlayer) { return; }
 
-        if (!mouseHoveror.currentCell.GetIsWalkable()) { return; }
-
         if (mouseHoveror.currentCell == null) { return; }
 
-        
+        if (!mouseHoveror.currentCell.GetIsWalkable()) { return; }
 
         CmdSetDestinationCell(mouseHoveror.currentCell.GetCellNumber());
     }
@@ -181,7 +188,7 @@ public class PlayerMovement : NetworkBehaviour
             // Check if player has past midpoint, once they have then move them to the new cell
             if ((Vector3.Distance(transform.position, nextCellPosition) < midwayPoint) && (hasHitMidpoint == false))
             {
-                cellObject.UpdateCell(nextCell, 1);
+                cellObject.UpdateCell(nextCell);
                 hasHitMidpoint = true;
             }
 
@@ -190,7 +197,7 @@ public class PlayerMovement : NetworkBehaviour
             yield return null;
         }
 
-        cellObject.UpdateCell(nextCell, 1); // for sprite sorting this should happen halfway through
+        cellObject.UpdateCell(nextCell); // for sprite sorting this should happen halfway through
         cellObject.FixPositionToCell();
         CompletePath();
     }
@@ -223,7 +230,7 @@ public class PlayerMovement : NetworkBehaviour
 
     #region Helper Functions
 
-    public Cell FindCellWithNumber(int cellNumber)
+    private Cell FindCellWithNumber(int cellNumber)
     {
         Cell[] cells = FindObjectsOfType<Cell>();
 
@@ -237,6 +244,13 @@ public class PlayerMovement : NetworkBehaviour
 
         Debug.LogError("Could not find cell with number - " + cellNumber);
         return null;
+    }
+
+
+    // Used currently to ensure start is run late (After all starts without the init coroutine)
+    IEnumerator InitCoroutine()
+    {
+        yield return new WaitForEndOfFrame();
     }
 
     Cell FindCellWithCoordinates(Vector3 coordinates)

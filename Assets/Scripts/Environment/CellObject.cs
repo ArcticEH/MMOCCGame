@@ -6,10 +6,21 @@ public class CellObject : MonoBehaviour
 {
     [SerializeField] IsometricObject[] myIsometricObjects;
     [SerializeField] Cell myCell;
+    [SerializeField] private int amountYRaised;
 
     private void Start()
     {
         myIsometricObjects = GetComponentsInChildren<IsometricObject>();
+
+        // Assign cell objects
+        if (myCell != null)
+        {
+            foreach (IsometricObject io in myIsometricObjects)
+            {
+                io.UpdateCell(myCell);
+            }
+        }
+
     }
 
     public void UpdateCell(Cell newCell, int index = -1)
@@ -21,6 +32,15 @@ public class CellObject : MonoBehaviour
             io.UpdateCell(newCell, index);
         }
     }
+
+    public void RemoveFromCell()
+    {
+        foreach (IsometricObject io in myIsometricObjects)
+        {
+            io.RemoveFromCell();
+        }
+    }
+
 
     public void FixPositionToCell()
     {
