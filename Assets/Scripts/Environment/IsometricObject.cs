@@ -6,6 +6,7 @@ using UnityEngine;
 public class IsometricObject : MonoBehaviour
 {
     [SerializeField] private float height = 0; // Specified by artist when deciding how items should be placed atop
+    [SerializeField] public int amountYRaised;
     [SerializeField] private bool isWalkable;
     [SerializeField] public int cellNumber;
     [SerializeField] public Cell myCell;
@@ -34,6 +35,8 @@ public class IsometricObject : MonoBehaviour
     // Update cell and tell cell to isometric object to attempt to find its own cell
     public void UpdateCell(int amountYRaised, int index = -1)
     {
+        this.amountYRaised = amountYRaised;
+
         // Remove from current cell if there is a cell
         if (myCell != null)
             myCell.objectsInCell.Remove(this);
@@ -48,7 +51,7 @@ public class IsometricObject : MonoBehaviour
             myCell.objectsInCell.Insert(index, this);
     }
 
-    // Update cell and provide isometric object with new cell
+    // Update cell and provide isometric object with new cell. Used only for player movement right now because finding cell is an issue when player sprite is between cells
     public void UpdateCell(Cell newCell, int index = -1)
     {
         // Remove from current cell if there is a cell

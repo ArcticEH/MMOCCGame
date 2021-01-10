@@ -54,6 +54,9 @@ public class Cell: MonoBehaviour
 
     public void AssignObjectOrderLayers()
     {
+        // Sort the objects by amount y raised first
+        objectsInCell.Sort((o1, o2) => o1.amountYRaised.CompareTo(o2.amountYRaised));
+
         // Get all isometric objects on this cell and apply them their sorting orders
         // *each cell is currently reserved 10 sorting layers but can use z values to order objects within the cell as well
         int objectNumber = 0;
