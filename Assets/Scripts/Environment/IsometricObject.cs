@@ -65,6 +65,7 @@ public class IsometricObject : MonoBehaviour
             myCell.objectsInCell.Insert(index, this);
     }
 
+    // Remove object from cell
     public void RemoveFromCell()
     {
         if (myCell == null) { return;  }
@@ -75,6 +76,7 @@ public class IsometricObject : MonoBehaviour
 
     #region Helper
 
+    // Find the cell that this isometric object belongs to based on position
     public Cell FindMyCell(int amountYRaised)
     {
         cellsManager = FindObjectOfType<CellsManager>();

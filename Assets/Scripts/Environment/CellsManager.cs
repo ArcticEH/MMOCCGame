@@ -11,12 +11,14 @@ public class CellsManager : MonoBehaviour
 
     private void Start()
     {
+        // Find all cells in scene
         cells = FindObjectsOfType<Cell>().ToList();
         DepthSort();
     }
 
     private void Update()
     {
+        // Depth sort on each frame
         DepthSort();
     }
 
