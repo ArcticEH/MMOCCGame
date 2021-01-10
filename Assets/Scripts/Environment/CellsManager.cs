@@ -11,16 +11,12 @@ public class CellsManager : MonoBehaviour
 
     private void Start()
     {
-        StartCoroutine(InitCoroutine());
-
- 
+        cells = FindObjectsOfType<Cell>().ToList();
+        DepthSort();
     }
 
     private void Update()
     {
-        if (cells.Count == 0)
-            cells = FindObjectsOfType<Cell>().ToList();
-
         DepthSort();
     }
 

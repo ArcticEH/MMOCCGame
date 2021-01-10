@@ -61,9 +61,6 @@ public class PlayerMovement : NetworkBehaviour
     {
         cellsManager = FindObjectOfType<CellsManager>();
 
-        // Depth sort so that client has proper cell numbering
-        cellsManager.DepthSort();
-
         // Set so that default value is spawn
         destinationCellNumber = FindObjectOfType<Spawn>().GetComponent<Cell>().cellNumber;
 
