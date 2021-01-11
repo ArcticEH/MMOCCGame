@@ -42,7 +42,6 @@ public class PathFinder : MonoBehaviour
 
     public List<Cell> GetPath()
     {
-        Debug.Log("Getting path on client");
         CalculatePath();
         return path;
     }

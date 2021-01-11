@@ -9,10 +9,6 @@ public class MouseHoveror : MonoBehaviour
     [SerializeField] public Cell currentCell;
     [SerializeField] private CellObject selectedCellSprite;
 
-    private void Awake()
-    {
-        selectedCellSprite = FindObjectOfType<CurrentCellSprite>().GetComponent<CellObject>();
-    }
 
     public void SetCurrentCell(Cell cell)
     {
