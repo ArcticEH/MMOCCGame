@@ -8,13 +8,13 @@ public class ChatBubble : MonoBehaviour
 
     private void Start()
     {
-        PlayerChatting.ClientOnReceivedMessage += Scroll;
+        PlayerChatting.ClientOnReceivedMessage += Scroll; // subscribe to event which triggers when client receives a chat bubble message
     }
 
 
     private void Update()
     {
-        timeBetweenScroll -= Time.deltaTime;
+        timeBetweenScroll -= Time.deltaTime; // timer in realtime seconds
 
         if (timeBetweenScroll < 0)
         {
@@ -23,25 +23,7 @@ public class ChatBubble : MonoBehaviour
         }
     }
 
-
-
-    //IEnumerator ScrollOffTime()
-    //{
-    //    var rectTransform = GetComponent<RectTransform>();
-
-    //    float nextPosition = rectTransform.anchoredPosition.y + rectTransform.rect.height;
-
-    //    while (rectTransform.anchoredPosition.y < nextPosition)
-    //    {
-    //        rectTransform.anchoredPosition = new Vector2(rectTransform.anchoredPosition.x, rectTransform.anchoredPosition.y + 0.5f);
-
-    //        yield return null;
-    //    }
-
-    //    yield break;
-    //}
-
-    private void Scroll()
+    private void Scroll() // blinks chat bubble along the y axis by the bubble height
     {
         var rectTransform = GetComponent<RectTransform>();
 

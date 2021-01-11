@@ -31,15 +31,15 @@ public class PlayerChatting : NetworkBehaviour
 
     private void Update()
     {
-        if (!Keyboard.current.enterKey.wasPressedThisFrame) { return; }
+        if (!Keyboard.current.enterKey.wasPressedThisFrame) { return; } // If player presses enter key
 
-        if (chatbarText.text == "") { return; }
+        if (chatbarText.text == "") { return; } // if player chatbar does not contain text return
 
-        if (!isLocalPlayer) { return; }
+        if (!isLocalPlayer) { return; } // if is not local player return
 
-        CmdSendMessage(myPlayer.GetPlayerName() + ": " + chatbarText.text, playerMovement.currentCell.transform.position);
+        CmdSendMessage(myPlayer.GetPlayerName() + ": " + chatbarText.text, playerMovement.currentCell.transform.position); // send message with player name & text with player cell position
 
-        chatbarText.text = string.Empty;
+        chatbarText.text = string.Empty; // Clear Chatbar Text
     }
 
     [Client]
@@ -55,18 +55,17 @@ public class PlayerChatting : NetworkBehaviour
     [ClientRpc]
     public void RpcHandleReceivedMessage(string message, Vector3 cellPosition)
     {
-
         var screenPosition = Camera.main.WorldToScreenPoint(cellPosition);
 
-        screenPosition.y = Screen.height * 2 / 3;
+        screenPosition.y = Screen.height * 2 / 3; // Sets screen position at 66.66% of screen height
         
-        var newMessage = Instantiate(chatBubble, chatLogCanvas.transform);
+        var newMessage = Instantiate(chatBubble, chatLogCanvas.transform); // instantiates chat bubble prefab on chatlog canvas
 
-        newMessage.transform.position = screenPosition;
+        newMessage.transform.position = screenPosition; // updates position of new bubble to screen position
 
-        newMessage.GetComponentInChildren<Text>().text = message;
+        newMessage.GetComponentInChildren<Text>().text = message; // searches for text component in new bubble and adds message text to it
 
-        ClientOnReceivedMessage?.Invoke();
+        ClientOnReceivedMessage?.Invoke(); // triggers client received message event
     }
 
     #endregion
