@@ -120,8 +120,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5583120e77cd2b04dba7ed09968ea32c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   myIsometricObjects: []
   myCell: {fileID: 0}
+  amountYRaised: 0
 --- !u!114 &691233752388718995
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -139,6 +142,7 @@ MonoBehaviour:
   chatBubble: {fileID: 6739801880370705923, guid: 3de87043c67858b4ca44975fdae24a3c,
     type: 3}
   playerMovement: {fileID: -7880275974491553655}
+  myPlayer: {fileID: 2438658846549957027}
 --- !u!1 &5321044453389837020
 GameObject:
   m_ObjectHideFlags: 0
@@ -234,7 +238,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 17f4aac26d6623f40a49410fac67c81b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  height: 0
+  amountYRaised: 0
   isWalkable: 1
   cellNumber: 0
   myCell: {fileID: 0}
-  Cells: {fileID: 0}
+  cellIndex: 0
+  cellsManager: {fileID: 0}

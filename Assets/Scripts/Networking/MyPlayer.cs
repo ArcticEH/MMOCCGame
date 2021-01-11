@@ -9,6 +9,11 @@ public class MyPlayer : NetworkBehaviour
 {
     [SerializeField] [SyncVar] string playerName;
 
+    public string GetPlayerName()
+    {
+        return playerName;
+    }
+
     #region Server
 
     public override void OnStartServer()

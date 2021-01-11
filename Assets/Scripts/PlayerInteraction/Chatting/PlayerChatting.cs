@@ -11,6 +11,7 @@ public class PlayerChatting : NetworkBehaviour
     InputField chatbarText;
     [SerializeField] GameObject chatBubble;
     [SerializeField] PlayerMovement playerMovement;
+    MyPlayer myPlayer;
     ChatLogCanvas chatLogCanvas;
 
     public static event Action ClientOnReceivedMessage;
@@ -26,7 +27,7 @@ public class PlayerChatting : NetworkBehaviour
     #endregion
 
 
-    #region Client
+    #region Client 
 
     private void Update()
     {
@@ -36,7 +37,7 @@ public class PlayerChatting : NetworkBehaviour
 
         if (!isLocalPlayer) { return; }
 
-        CmdSendMessage(chatbarText.text, playerMovement.currentCell.transform.position);
+        CmdSendMessage(myPlayer.GetPlayerName() + ": " + chatbarText.text, playerMovement.currentCell.transform.position);
 
         chatbarText.text = string.Empty;
     }
@@ -46,6 +47,7 @@ public class PlayerChatting : NetworkBehaviour
     {
         base.OnStartClient();
 
+        myPlayer = GetComponent<MyPlayer>();
         chatbarText = FindObjectOfType<Chatbar>().GetComponent<InputField>();
         chatLogCanvas = FindObjectOfType<ChatLogCanvas>();
     }
