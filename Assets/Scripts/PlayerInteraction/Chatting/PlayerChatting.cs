@@ -31,6 +31,8 @@ public class PlayerChatting : NetworkBehaviour
 
     private void Update()
     {
+        chatbarText.ActivateInputField(); // !!! ACTIVATES ON EVERY FRAME. TEMPORARY SO PLAYER CAN ALWAYS TYPE WITHOUT NEEDING TO CLICK ON INPUT FIELD !!!
+
         if (!Keyboard.current.enterKey.wasPressedThisFrame) { return; } // If player presses enter key
 
         if (chatbarText.text == "") { return; } // if player chatbar does not contain text return
