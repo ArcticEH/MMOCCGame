@@ -224,6 +224,7 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0.1
   playerName: 
+  playerLabelText: {fileID: 8453491247988476864}
 --- !u!114 &-7880275974491553655
 MonoBehaviour:
   m_ObjectHideFlags: 0

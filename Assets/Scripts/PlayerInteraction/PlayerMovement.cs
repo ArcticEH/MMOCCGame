@@ -194,7 +194,7 @@ public class PlayerMovement : NetworkBehaviour
             yield return null;
         }
 
-        cellObject.UpdateCell(nextCell); // for sprite sorting this should happen halfway through
+        //cellObject.UpdateCell(nextCell); // for sprite sorting this should happen halfway through
         cellObject.FixPositionToCell();
         CompletePath();
     }
