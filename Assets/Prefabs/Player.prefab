@@ -434,6 +434,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ca4434b89afbcd947942aead41025a95, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  myPlayer: {fileID: 2438658846549957027}
 --- !u!1 &5321044453389837020
 GameObject:
   m_ObjectHideFlags: 0
@@ -611,3 +612,4 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+
