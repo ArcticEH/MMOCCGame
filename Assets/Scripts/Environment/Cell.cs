@@ -68,15 +68,4 @@ public class Cell: MonoBehaviour
         }
     }
 
-    private void OnMouseEnter()
-    {
-        // Set current cell on mouse hoveror
-        mouseHoveror.SetCurrentCell(this);
-    }
-
-    private void OnMouseExit()
-    {
-        mouseHoveror.RemoveFromCell();
-    }
-
 }

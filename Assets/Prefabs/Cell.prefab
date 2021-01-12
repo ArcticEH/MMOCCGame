@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 7780787475517390664}
   - component: {fileID: 1624605965}
   - component: {fileID: 1053775589482029288}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Cell
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -142,8 +142,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   height: 0
+  amountYRaised: 0
   isWalkable: 1
   cellNumber: 0
   myCell: {fileID: 174477257112795489}
   cellIndex: 0
-  Cells: {fileID: 0}
+  cellsManager: {fileID: 0}
