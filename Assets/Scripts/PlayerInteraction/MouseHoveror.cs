@@ -1,4 +1,5 @@
 ﻿using Mirror;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -12,14 +13,20 @@ public class MouseHoveror : MonoBehaviour
 
     private void Update()
     {
+        CurrentCellRaycast();
+    }
+
+    private void CurrentCellRaycast()
+    {
         // Create ray on every frame from current mouse position
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        RaycastHit2D hit = Physics2D.Raycast(ray.origin, ray.direction, cellLayer);
+        RaycastHit2D hit = Physics2D.Raycast(ray.origin, ray.direction, 10f, cellLayer);
 
         // If hit - only change cell if its not the same as current
         if (hit)
         {
             Cell hitCell = hit.collider.gameObject.GetComponent<Cell>();
+
             if (hitCell == currentCell) { return; }
             SetCurrentCell(hitCell);
             return;
@@ -30,6 +37,13 @@ public class MouseHoveror : MonoBehaviour
         {
             RemoveFromCell();
         }
+    }
+
+    private void PlayerLabelRaycast()
+    {
+
+
+       
     }
 
     public void SetCurrentCell(Cell cell)

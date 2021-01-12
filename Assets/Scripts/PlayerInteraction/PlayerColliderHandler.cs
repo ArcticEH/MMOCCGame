@@ -5,7 +5,6 @@ using UnityEngine;
 public class PlayerColliderHandler : MonoBehaviour
 {
     [SerializeField] GameObject playerLabelCanvas;
-    [SerializeField] LayerMask layerMask;
 
 
     private void Update()
@@ -16,7 +15,7 @@ public class PlayerColliderHandler : MonoBehaviour
         bool playerHit = false;
         foreach (RaycastHit2D hit in hits)
         {
-            if (hit.transform.gameObject.tag == "Player")
+            if (hit.transform.gameObject == this.gameObject)
             {
                 playerHit = true;
             }

@@ -151,7 +151,7 @@ GameObject:
   - component: {fileID: 3821686521398991521}
   - component: {fileID: 691233752388718995}
   - component: {fileID: 3728668890746182110}
-  - component: {fileID: 372817599207999314}
+  - component: {fileID: 3111989998330887407}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -305,7 +305,7 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 22.455597, y: 45.175045}
   m_EdgeRadius: 0
---- !u!114 &372817599207999314
+--- !u!114 &3111989998330887407
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -318,9 +318,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerLabelCanvas: {fileID: 4283248504344199870}
-  layerMask:
-    serializedVersion: 2
-    m_Bits: 32
 --- !u!1 &4283248504344199870
 GameObject:
   m_ObjectHideFlags: 0
@@ -434,7 +431,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ca4434b89afbcd947942aead41025a95, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  myPlayer: {fileID: 2438658846549957027}
 --- !u!1 &5321044453389837020
 GameObject:
   m_ObjectHideFlags: 0
@@ -612,4 +608,3 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
-

@@ -47,6 +47,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   currentCell: {fileID: 0}
   selectedCellSprite: {fileID: 7648611972171897744}
+  cellLayer:
+    serializedVersion: 2
+    m_Bits: 256
 --- !u!114 &2262805562179532444
 MonoBehaviour:
   m_ObjectHideFlags: 0
