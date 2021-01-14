@@ -21,9 +21,7 @@ public class MyPlayer : NetworkBehaviour
 
     public override void OnStartServer()
     {
-        // For now, create a name for the player
-        int numPlayers = MyNetworkManager.Players.Count;
-        playerName = $"Player {numPlayers}";
+        playerName = name;
     }
 
 
@@ -34,6 +32,10 @@ public class MyPlayer : NetworkBehaviour
 
     private void Start()
     {
+        if (isLocalPlayer)
+        {
+            playerName = FindObjectOfType<MyNetworkManager>().characterMessage.playerName;
+        }
         playerLabelText.text = playerName;
     }
 

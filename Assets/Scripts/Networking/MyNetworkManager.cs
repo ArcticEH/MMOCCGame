@@ -1,14 +1,15 @@
-﻿using System;
-using System.Collections;
+﻿using Mirror;
+using System;
 using System.Collections.Generic;
-using Mirror;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class MyNetworkManager : NetworkManager
 {
     // List of players
-    static public List<MyPlayer> Players = new List<MyPlayer>();
+    [SerializeField] static public List<MyPlayer> Players = new List<MyPlayer>();
 
+    public CreateCharacterMessage characterMessage;
 
     // Events
     public static event Action ClientOnConnected;
@@ -36,15 +37,31 @@ public class MyNetworkManager : NetworkManager
         Players.Remove(player);
     }
 
+    public void OnSpawnPlayer(NetworkConnection conn, CreateCharacterMessage message)
+    {
+        var newPlayer = Instantiate(playerPrefab);
 
+        NetworkServer.AddPlayerForConnection(conn, newPlayer);
+    }
     #endregion
 
+
+
+
     #region Client
+
+    public override void Awake()
+    {
+        base.Awake();
+    }
 
     // Used when a client connects to server
     public override void OnClientConnect(NetworkConnection conn)
     {
         base.OnClientConnect(conn);
+
+        conn.Send(characterMessage);
+
         ClientOnConnected?.Invoke();
     }
 
@@ -53,6 +70,12 @@ public class MyNetworkManager : NetworkManager
     {
         base.OnClientDisconnect(conn);
         ClientOnDisconnected?.Invoke();
+    }
+
+    //Spawn the Player
+    public void SpawnPlayer()
+    {
+        NetworkServer.RegisterHandler<CreateCharacterMessage>(OnSpawnPlayer);
     }
 
     #endregion
