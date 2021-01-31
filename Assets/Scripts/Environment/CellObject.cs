@@ -1,9 +1,8 @@
-﻿using Mirror;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CellObject : NetworkBehaviour
+public class CellObject : MonoBehaviour
 {
     [SerializeField] IsometricObject[] myIsometricObjects;
     [SerializeField] Cell myCell;

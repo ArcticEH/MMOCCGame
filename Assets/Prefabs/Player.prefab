@@ -145,8 +145,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2438658846549957037}
   - component: {fileID: 1082153176691260922}
-  - component: {fileID: 2438658846549957026}
-  - component: {fileID: 2438658846549957027}
+  - component: {fileID: 8981377859614431085}
   - component: {fileID: -7880275974491553655}
   - component: {fileID: 3821686521398991521}
   - component: {fileID: 691233752388718995}
@@ -193,7 +192,7 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
---- !u!114 &2438658846549957026
+--- !u!114 &8981377859614431085
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -202,29 +201,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 2438658846549957024}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9b91ecbcc199f4492b9a91e820070131, type: 3}
+  m_Script: {fileID: 11500000, guid: cb2053e3d94cd8042a616ba86e349809, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sceneId: 0
-  serverOnly: 0
-  m_AssetId: 
-  hasSpawned: 0
---- !u!114 &2438658846549957027
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2438658846549957024}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 57c4b4b10d965854fbc754360a9fd229, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  syncMode: 0
-  syncInterval: 0.1
-  playerName: 
-  playerLabelText: {fileID: 8453491247988476864}
 --- !u!114 &-7880275974491553655
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -237,8 +216,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b93b32cbc8e20244c9554ef6cc1efc9c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  syncMode: 0
-  syncInterval: 0.1
   destinationCellNumber: 0
   currentCellNumber: 0
   movementSpeed: 75
@@ -258,8 +235,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5583120e77cd2b04dba7ed09968ea32c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  syncMode: 0
-  syncInterval: 0.1
   myIsometricObjects: []
   myCell: {fileID: 0}
   amountYRaised: 0
@@ -275,8 +250,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 14dd2e28bd3a42544b9141c20d191f68, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  syncMode: 0
-  syncInterval: 0.1
   chatBubble: {fileID: 6739801880370705923, guid: 3de87043c67858b4ca44975fdae24a3c,
     type: 3}
   playerMovement: {fileID: -7880275974491553655}

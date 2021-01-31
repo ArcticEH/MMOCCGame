@@ -1,28 +1,27 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Mirror;
 using UnityEngine.UI;
 using UnityEngine.InputSystem;
 using System;
 
-public class PlayerChatting : NetworkBehaviour
+public class PlayerChatting : MonoBehaviour
 {
     InputField chatbarText;
     [SerializeField] GameObject chatBubble;
     [SerializeField] PlayerMovement playerMovement;
-    MyPlayer myPlayer;
+    //MyPlayer myPlayer;
     ChatLogCanvas chatLogCanvas;
 
     public static event Action ClientOnReceivedMessage;
 
     #region Server
     
-    [Command]
-    public void CmdSendMessage(string message, Vector3 cellPosition)
-    { 
-        RpcHandleReceivedMessage(message, cellPosition);
-    }
+    //[Command]
+    //public void CmdSendMessage(string message, Vector3 cellPosition)
+    //{ 
+    //    RpcHandleReceivedMessage(message, cellPosition);
+    //}
 
     #endregion
 
@@ -31,30 +30,30 @@ public class PlayerChatting : NetworkBehaviour
 
     private void Update()
     {
-        chatbarText.ActivateInputField(); // !!! ACTIVATES ON EVERY FRAME. TEMPORARY SO PLAYER CAN ALWAYS TYPE WITHOUT NEEDING TO CLICK ON INPUT FIELD !!!
+        //chatbarText.ActivateInputField(); // !!! ACTIVATES ON EVERY FRAME. TEMPORARY SO PLAYER CAN ALWAYS TYPE WITHOUT NEEDING TO CLICK ON INPUT FIELD !!!
 
         if (!Keyboard.current.enterKey.wasPressedThisFrame) { return; } // If player presses enter key
 
         if (chatbarText.text == "") { return; } // if player chatbar does not contain text return
 
-        if (!isLocalPlayer) { return; } // if is not local player return
+   //     if (!isLocalPlayer) { return; } // if is not local player return
 
-        CmdSendMessage(myPlayer.GetPlayerName() + ": " + chatbarText.text, playerMovement.currentCell.transform.position); // send message with player name & text with player cell position
+   //     CmdSendMessage(myPlayer.GetPlayerName() + ": " + chatbarText.text, playerMovement.currentCell.transform.position); // send message with player name & text with player cell position
 
         chatbarText.text = string.Empty; // Clear Chatbar Text
     }
 
-    [Client]
-    public override void OnStartClient()
-    {
-        base.OnStartClient();
+   // [Client]
+    //public override void OnStartClient()
+    //{
+    //    base.OnStartClient();
 
-        myPlayer = GetComponent<MyPlayer>();
-        chatbarText = FindObjectOfType<Chatbar>().GetComponent<InputField>();
-        chatLogCanvas = FindObjectOfType<ChatLogCanvas>();
-    }
+    //    myPlayer = GetComponent<MyPlayer>();
+    //    chatbarText = FindObjectOfType<Chatbar>().GetComponent<InputField>();
+    //    chatLogCanvas = FindObjectOfType<ChatLogCanvas>();
+    //}
 
-    [ClientRpc]
+  //  [ClientRpc]
     public void RpcHandleReceivedMessage(string message, Vector3 cellPosition)
     {
         var screenPosition = Camera.main.WorldToScreenPoint(cellPosition);

@@ -1,15 +1,14 @@
-﻿using Mirror;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class PlayerMovement : NetworkBehaviour
+public class PlayerMovement : MonoBehaviour
 {
-    // Sync vars
-    [SerializeField] [SyncVar(hook = nameof(HandleDestinationCellChanged))] int destinationCellNumber;
-    [SerializeField] [SyncVar(hook = nameof(HandleCurrentCellChanged))] int currentCellNumber;
+    
+    [SerializeField] int destinationCellNumber;
+    [SerializeField] int currentCellNumber;
 
     // Movement
     [SerializeField] float movementSpeed = 50f;
@@ -21,33 +20,34 @@ public class PlayerMovement : NetworkBehaviour
 
     // Caches
     [SerializeField] MouseHoveror mouseHoveror;
+    [SerializeField] Player playerInformation;
     CellsManager cellsManager;
     Animator playerAnimator;
     CellObject cellObject;
 
     #region Server
 
-    [Server]
-    public override void OnStartServer()
+    //   [Server]
+    public void OnEnterRoom()
     {
         // Spawn player on spawn cell
+
         currentCellNumber = FindObjectOfType<Spawn>().GetComponent<Cell>().cellNumber;
+        this.transform.position = FindObjectOfType<Spawn>().transform.position;
     }
 
-    public override void OnStopServer()
+    public void OnStopServer()
     {
         // Remove player from its cell
         cellObject.RemoveFromCell();
     }
 
-    [Command]
     public void CmdSetDestinationCell(int cellNumber)
     {
         // TODO:  Add some type of verification here
         destinationCellNumber = cellNumber;
     }
 
-    [Command]
     public void CmdSetCurrentCell(int cellNumber)
     {
         // Used to sync where local player sets their cell at
@@ -62,7 +62,7 @@ public class PlayerMovement : NetworkBehaviour
         cellsManager = FindObjectOfType<CellsManager>();
 
         // Set so that default value is spawn
-        destinationCellNumber = FindObjectOfType<Spawn>().GetComponent<Cell>().cellNumber;
+     //   destinationCellNumber = FindObjectOfType<Spawn>().GetComponent<Cell>().cellNumber;
 
         // Set cached vars
         mouseHoveror = FindObjectOfType<MouseHoveror>();
@@ -74,12 +74,12 @@ public class PlayerMovement : NetworkBehaviour
     private void Start()
     {
         // Place at where server says current cell is
-        currentCell = FindCellWithNumber(currentCellNumber);
+    //    currentCell = FindCellWithNumber(currentCellNumber);
         cellObject.UpdateCell(currentCell);
         cellObject.FixPositionToCell();
 
         // Start pathing if player is currently moving
-        if (currentCellNumber != destinationCellNumber)
+  //      if (currentCellNumber != destinationCellNumber)
         {
             pathfinder.SetStartingCells(currentCell, FindCellWithNumber(destinationCellNumber));
             currentPath = pathfinder.GetPath();
@@ -88,26 +88,23 @@ public class PlayerMovement : NetworkBehaviour
         }
     }
 
-    [ClientCallback]
+   // [ClientCallback]
     private void Update()
     {
-        
         if (!Mouse.current.leftButton.wasPressedThisFrame) { return; }
-
-        if (!isLocalPlayer) { return; }
 
         if (mouseHoveror.currentCell == null) { return; }
 
         if (!mouseHoveror.currentCell.GetIsWalkable()) { return; }
 
-        CmdSetDestinationCell(mouseHoveror.currentCell.GetCellNumber());
+   //     CmdSetDestinationCell(mouseHoveror.currentCell.GetCellNumber());
     }
 
-    [Client]
+   /// [Client]
     public void HandleDestinationCellChanged(int oldCell, int newCell)
     {
         // For some reason, even though this is a hook and shouldnt be run on the server I have to check if its a client otherwise it wont deserialize properly
-        if (isClient)
+       // if (isClient)
         {
             pathfinder.SetStartingCells(currentCell, FindCellWithNumber(newCell));
             currentPath = pathfinder.GetPath();
@@ -116,7 +113,7 @@ public class PlayerMovement : NetworkBehaviour
         }
     }
 
-    [Client]
+   /// [Client]
     public void HandleCurrentCellChanged(int oldcell, int newCell)
     {
         // cell changed
@@ -124,7 +121,7 @@ public class PlayerMovement : NetworkBehaviour
 
     #region Player Movement 
 
-    [Client]
+  //  [Client]
     public void PerformPathing()
     {
 
@@ -145,15 +142,15 @@ public class PlayerMovement : NetworkBehaviour
         }
     }
 
-    [Client]
+   // [Client]
     private IEnumerator PerformMovement(Cell nextCell)
     {
 
         currentCell = nextCell; // set current cell here since the movement will be completed - otherwise pathfinder may still include previous cell on multiple clicks
 
-        if (isLocalPlayer)
+      //  if (isLocalPlayer)
         {
-            CmdSetCurrentCell(currentCell.GetCellNumber()); // Update cell number on server
+   //         CmdSetCurrentCell(currentCell.GetCellNumber()); // Update cell number on server
         }
 
         var nextCellPosition = nextCell.transform.position;
@@ -199,11 +196,11 @@ public class PlayerMovement : NetworkBehaviour
         CompletePath();
     }
 
-    //private void MoveToCell()
-    //{
-    //    transform.parent = nextCell.transform;
-    //    transform.SetSiblingIndex(1);
-    //}
+    private void MoveToCell()
+    {
+        transform.parent = nextCell.transform;
+        transform.SetSiblingIndex(1);
+    }
 
     // Checks if pathing should continue or stop
     private void CompletePath()
