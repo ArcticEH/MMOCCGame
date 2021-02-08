@@ -204,6 +204,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cb2053e3d94cd8042a616ba86e349809, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  webSocketManager: {fileID: 0}
+  playerMovement: {fileID: -7880275974491553655}
+  PlayerName: 
+  PlayerNumber: 0
+  Id: 
+  InRoom: 
+  OnCell: 0
 --- !u!114 &-7880275974491553655
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -222,7 +229,9 @@ MonoBehaviour:
   currentCell: {fileID: 0}
   currentPath: []
   isPathing: 0
+  webSocketManager: {fileID: 0}
   mouseHoveror: {fileID: 0}
+  playerInformation: {fileID: 0}
 --- !u!114 &3821686521398991521
 MonoBehaviour:
   m_ObjectHideFlags: 0

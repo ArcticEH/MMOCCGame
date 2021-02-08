@@ -10,9 +10,7 @@ using System;
 public class WebSocketManager : MonoBehaviour
 {
     [SerializeField] public PlayerInformation myPlayerInformation;
-
     public WebSocket ws;
-
     Queue<MessageContainer> receivedMessages = new Queue<MessageContainer>();
 
     [SerializeField] PlayerSpawner playerSpawner;
@@ -30,13 +28,29 @@ public class WebSocketManager : MonoBehaviour
             PlayerInformation myGivenPlayerInformation = JsonUtility.FromJson<PlayerInformation>(nextMessage.Data);
             myPlayerInformation = myGivenPlayerInformation;
 
-            playerSpawner.SpawnMessageHandler(myPlayerInformation);
+            playerSpawner.SpawnMessageHandler(myPlayerInformation); // temporary to spawn player here since game starts in public room. Change when player enters public rooms after.
         }
         else if (nextMessage.MessageType == MessageType.Spawn)
         {
             PlayerInformation playerInformation = JsonUtility.FromJson<PlayerInformation>(nextMessage.Data);
-
             playerSpawner.SpawnMessageHandler(playerInformation);
+        }
+        else if (nextMessage.MessageType == MessageType.Movement)
+        {
+            MovementData newMovementData = JsonUtility.FromJson<MovementData>(nextMessage.Data);
+
+            Player[] playersArray = FindObjectOfType<Players>().GetComponentsInChildren<Player>();
+
+            foreach(Player player in playersArray)
+            {
+                if (player.PlayerNumber == newMovementData.playerNumber)
+                {
+                    player.OnCell = newMovementData.destinationCellNumber;
+                    player.playerMovement.HandleDestinationCellChanged(newMovementData.destinationCellNumber);
+                    break;
+                }
+            }
+
         }
     }
 
@@ -61,20 +75,22 @@ public class WebSocketManager : MonoBehaviour
         };
 
         // Add OnError event listener
-        ws.OnError += (string errMsg) =>
-        {
-            Debug.Log("WS error: " + errMsg);
-        };
-
+        ws.OnError += (string errMsg) => { Debug.Log("WS error: " + errMsg); };
+            
         // Add OnClose event listener
-        ws.OnClose += (WebSocketCloseCode code) =>
-        {
-            Debug.Log("WS closed with code: " + code.ToString());
-        };
+        ws.OnClose += (WebSocketCloseCode code) => { Debug.Log("WS closed with code: " + code.ToString()); };
 
         // Connect to the server
         ws.Connect();
     }
+
+
+
+
+
+    /// <summary>
+    /// //////////////////////////////////// BEYOND HERE IS CLASS INFORMATION ////////////////////////////////////
+    /// </summary>
 
     [Serializable]
     public class MessageContainer
@@ -137,7 +153,22 @@ public class WebSocketManager : MonoBehaviour
     public enum MessageType
     {
         NewServerConnection,
-        Spawn
+        Spawn,
+        Movement,
+        UpdateInformation
+    }
+
+    [Serializable]
+    public class MovementData : MessageData
+    {
+        [SerializeField] public int playerNumber;
+        [SerializeField] public int destinationCellNumber;
+
+        public MovementData(int playerRequestingMovement, int destination)
+        {
+            playerNumber = playerRequestingMovement;
+            destinationCellNumber = destination;
+        }
     }
 
 }

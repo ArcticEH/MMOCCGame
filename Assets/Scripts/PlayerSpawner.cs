@@ -20,7 +20,18 @@ public class PlayerSpawner : MonoBehaviour
 
     public void SpawnMessageHandler(WebSocketManager.PlayerInformation playerInformation)
     {
-        if (playerInformation.GetPlayerNumber() == FindObjectOfType<WebSocketManager>().myPlayerInformation.PlayerNumber) // If its my player then spawn my player.
+        SpawnPlayer(playerInformation);
+    }
+
+    
+    
+    
+    
+    
+    
+    private void SpawnPlayer(WebSocketManager.PlayerInformation playerInformation)
+    {
+        if (playerInformation.GetPlayerNumber() == webSocketManager.myPlayerInformation.GetPlayerNumber()) // If its my player then spawn my player.
         {
             if (isMyPlayerSpawned == true) { return; }
 
@@ -30,10 +41,10 @@ public class PlayerSpawner : MonoBehaviour
             mySpawnedPlayer.PlayerNumber = playerInformation.PlayerNumber;
             mySpawnedPlayer.Id = playerInformation.Id;
             mySpawnedPlayer.InRoom = playerInformation.InRoom;
-            mySpawnedPlayer.OnCell = playerInformation.OnCell;
 
-            // Move player to spawn cell.
-            mySpawnedPlayer.transform.position = FindObjectOfType<Spawn>().transform.position;
+            // Set player current cell to spawn.
+            mySpawnedPlayer.playerMovement.currentCell = FindObjectOfType<Spawn>().GetComponent<Cell>(); // Set player spawn cell.
+            mySpawnedPlayer.OnCell = FindObjectOfType<Spawn>().GetComponent<Cell>().cellNumber;
 
             // Send to server that I spawned with player information
             WebSocketManager.MessageContainer newMessageContainer = new WebSocketManager.MessageContainer(WebSocketManager.MessageType.Spawn, JsonUtility.ToJson(playerInformation));
@@ -42,20 +53,31 @@ public class PlayerSpawner : MonoBehaviour
 
             isMyPlayerSpawned = true;
         }
-        else if (playerInformation.GetPlayerNumber() != FindObjectOfType<WebSocketManager>().myPlayerInformation.PlayerNumber)
+        else
         {
             // spawn the new player
             Player newSpawnedPlayer = Instantiate<Player>(playerPrefab, FindObjectOfType<Players>().transform);
-
-            Debug.Log(newSpawnedPlayer);
             newSpawnedPlayer.PlayerName = playerInformation.PlayerName;
             newSpawnedPlayer.PlayerNumber = playerInformation.PlayerNumber;
             newSpawnedPlayer.Id = playerInformation.Id;
             newSpawnedPlayer.InRoom = playerInformation.InRoom;
-            newSpawnedPlayer.OnCell = playerInformation.OnCell;
 
-            // Move player to spawn cell
-            newSpawnedPlayer.transform.position = FindObjectOfType<Spawn>().transform.position;
+            
+
+            // Move and set player to proper cell
+            Cell[] cellArray = FindObjectsOfType<Cell>();
+            
+            foreach(Cell cell in cellArray)
+            {
+                if (cell.cellNumber == playerInformation.OnCell)
+                {
+                    newSpawnedPlayer.playerMovement.currentCell = cell;
+                    newSpawnedPlayer.OnCell = playerInformation.OnCell;
+                }
+            }
+
+            
+            
         }
     }
 

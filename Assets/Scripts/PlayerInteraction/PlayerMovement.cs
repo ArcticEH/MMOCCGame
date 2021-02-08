@@ -3,10 +3,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using System.Text;
 
 public class PlayerMovement : MonoBehaviour
 {
-    
     [SerializeField] int destinationCellNumber;
     [SerializeField] int currentCellNumber;
 
@@ -19,52 +19,24 @@ public class PlayerMovement : MonoBehaviour
     public bool isPathing = false;
 
     // Caches
+    [SerializeField] WebSocketManager webSocketManager;
     [SerializeField] MouseHoveror mouseHoveror;
     [SerializeField] Player playerInformation;
     CellsManager cellsManager;
     Animator playerAnimator;
     CellObject cellObject;
 
-    #region Server
 
-    //   [Server]
-    public void OnEnterRoom()
-    {
-        // Spawn player on spawn cell
-
-        currentCellNumber = FindObjectOfType<Spawn>().GetComponent<Cell>().cellNumber;
-        this.transform.position = FindObjectOfType<Spawn>().transform.position;
-    }
-
-    public void OnStopServer()
-    {
-        // Remove player from its cell
-        cellObject.RemoveFromCell();
-    }
-
-    public void CmdSetDestinationCell(int cellNumber)
-    {
-        // TODO:  Add some type of verification here
-        destinationCellNumber = cellNumber;
-    }
-
-    public void CmdSetCurrentCell(int cellNumber)
-    {
-        // Used to sync where local player sets their cell at
-        currentCellNumber = cellNumber;
-    }
-    #endregion
-
-    #region Client
 
     private void Awake()
     {
         cellsManager = FindObjectOfType<CellsManager>();
 
         // Set so that default value is spawn
-     //   destinationCellNumber = FindObjectOfType<Spawn>().GetComponent<Cell>().cellNumber;
+        destinationCellNumber = FindObjectOfType<Spawn>().GetComponent<Cell>().cellNumber;
 
         // Set cached vars
+        webSocketManager = FindObjectOfType<WebSocketManager>();
         mouseHoveror = FindObjectOfType<MouseHoveror>();
         pathfinder = FindObjectOfType<PathFinder>();
         playerAnimator = GetComponent<Animator>();
@@ -74,12 +46,12 @@ public class PlayerMovement : MonoBehaviour
     private void Start()
     {
         // Place at where server says current cell is
-    //    currentCell = FindCellWithNumber(currentCellNumber);
+        // currentCell = FindCellWithNumber(currentCellNumber);
         cellObject.UpdateCell(currentCell);
         cellObject.FixPositionToCell();
 
         // Start pathing if player is currently moving
-  //      if (currentCellNumber != destinationCellNumber)
+        if (currentCellNumber != destinationCellNumber)
         {
             pathfinder.SetStartingCells(currentCell, FindCellWithNumber(destinationCellNumber));
             currentPath = pathfinder.GetPath();
@@ -97,14 +69,18 @@ public class PlayerMovement : MonoBehaviour
 
         if (!mouseHoveror.currentCell.GetIsWalkable()) { return; }
 
-   //     CmdSetDestinationCell(mouseHoveror.currentCell.GetCellNumber());
+        if (currentCellNumber == mouseHoveror.currentCell.GetCellNumber()) { return; }
+
+        destinationCellNumber = mouseHoveror.currentCell.GetCellNumber();
+
+        WebSocketManager.MovementData movementRequest = new WebSocketManager.MovementData(webSocketManager.myPlayerInformation.PlayerNumber, destinationCellNumber);
+        WebSocketManager.MessageContainer messageContainer = new WebSocketManager.MessageContainer(WebSocketManager.MessageType.Movement, JsonUtility.ToJson(movementRequest));
+        webSocketManager.ws.Send(Encoding.UTF8.GetBytes(JsonUtility.ToJson(messageContainer)));
     }
 
    /// [Client]
-    public void HandleDestinationCellChanged(int oldCell, int newCell)
+    public void HandleDestinationCellChanged(int newCell)
     {
-        // For some reason, even though this is a hook and shouldnt be run on the server I have to check if its a client otherwise it wont deserialize properly
-       // if (isClient)
         {
             pathfinder.SetStartingCells(currentCell, FindCellWithNumber(newCell));
             currentPath = pathfinder.GetPath();
@@ -119,7 +95,6 @@ public class PlayerMovement : MonoBehaviour
         // cell changed
     }
 
-    #region Player Movement 
 
   //  [Client]
     public void PerformPathing()
@@ -142,7 +117,7 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-   // [Client]
+   
     private IEnumerator PerformMovement(Cell nextCell)
     {
 
@@ -182,6 +157,14 @@ public class PlayerMovement : MonoBehaviour
             // Check if player has past midpoint, once they have then move them to the new cell
             if ((Vector3.Distance(transform.position, nextCellPosition) < midwayPoint) && (hasHitMidpoint == false))
             {
+                if (GetComponent<Player>().PlayerNumber == webSocketManager.myPlayerInformation.PlayerNumber)
+                {
+                    webSocketManager.myPlayerInformation.OnCell = nextCell.cellNumber;
+                    WebSocketManager.MessageContainer updateInformationMessageContainer = new WebSocketManager.MessageContainer(WebSocketManager.MessageType.UpdateInformation, 
+                    JsonUtility.ToJson(FindObjectOfType<WebSocketManager>().myPlayerInformation));
+                    webSocketManager.ws.Send(Encoding.UTF8.GetBytes(JsonUtility.ToJson(updateInformationMessageContainer)));
+                }
+
                 cellObject.UpdateCell(nextCell);
                 hasHitMidpoint = true;
             }
@@ -218,13 +201,13 @@ public class PlayerMovement : MonoBehaviour
 
     }
 
-    #endregion
+    
 
-    #endregion
+ 
 
     #region Helper Functions
 
-    private Cell FindCellWithNumber(int cellNumber)
+    public Cell FindCellWithNumber(int cellNumber)
     {
         Cell[] cells = FindObjectsOfType<Cell>();
 
@@ -270,5 +253,4 @@ public class PlayerMovement : MonoBehaviour
     }
 
     #endregion
-
 }

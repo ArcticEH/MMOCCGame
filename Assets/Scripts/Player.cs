@@ -8,7 +8,7 @@ using System;
 public class Player : MonoBehaviour
 {
     public WebSocketManager webSocketManager;
-
+    public PlayerMovement playerMovement;
 
     [SerializeField] public string PlayerName;
     [SerializeField] public int PlayerNumber;
