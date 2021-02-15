@@ -9,7 +9,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1911255391760251532}
-  - component: {fileID: 639918027986414276}
   - component: {fileID: 5638153780010441867}
   m_Layer: 0
   m_Name: defaultCube
@@ -33,22 +32,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &639918027986414276
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4012650276517060163}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9b91ecbcc199f4492b9a91e820070131, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  sceneId: 0
-  serverOnly: 0
-  m_AssetId: 
-  hasSpawned: 0
 --- !u!114 &5638153780010441867
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -63,6 +46,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   myIsometricObjects: []
   myCell: {fileID: 0}
+  amountYRaised: 0
 --- !u!1 &4737630978360028266
 GameObject:
   m_ObjectHideFlags: 0
@@ -157,7 +141,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 17f4aac26d6623f40a49410fac67c81b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  height: 0
+  amountYRaised: 0
   isWalkable: 0
   cellNumber: 0
   myCell: {fileID: 0}
-  Cells: {fileID: 0}
+  cellIndex: 0
+  cellsManager: {fileID: 0}

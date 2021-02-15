@@ -5,6 +5,11 @@ using UnityEngine;
 
 public class PlayerLabel : MonoBehaviour
 {
+    [SerializeField] TextMeshProUGUI playerLabelText;
 
+    public void SetText(string text)
+    {
+        playerLabelText.SetText(text);
+    }
 
 }

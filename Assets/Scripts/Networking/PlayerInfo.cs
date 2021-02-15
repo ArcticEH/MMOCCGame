@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Players : MonoBehaviour
+public class PlayerInfo : MonoBehaviour
 {
     // Start is called before the first frame update
     void Start()
@@ -14,5 +14,4 @@ public class Players : MonoBehaviour
     void Update()
     {
         
-    }
-}
+    }}

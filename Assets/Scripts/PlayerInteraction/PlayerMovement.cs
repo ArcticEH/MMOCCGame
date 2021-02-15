@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using System.Text;
+using static WebSocketManager;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -21,11 +22,10 @@ public class PlayerMovement : MonoBehaviour
     // Caches
     [SerializeField] WebSocketManager webSocketManager;
     [SerializeField] MouseHoveror mouseHoveror;
-    [SerializeField] Player playerInformation;
     CellsManager cellsManager;
     Animator playerAnimator;
     CellObject cellObject;
-
+    NetworkPlayer networkPlayer;
 
 
     private void Awake()
@@ -41,6 +41,7 @@ public class PlayerMovement : MonoBehaviour
         pathfinder = FindObjectOfType<PathFinder>();
         playerAnimator = GetComponent<Animator>();
         cellObject = GetComponent<CellObject>();
+        networkPlayer = GetComponent<NetworkPlayer>();
     }
 
     private void Start()
@@ -60,9 +61,10 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-   // [ClientCallback]
     private void Update()
     {
+        if (networkPlayer.Id != webSocketManager.localNetworkPlayerId) { return;  } // Only check if this is the local player
+
         if (!Mouse.current.leftButton.wasPressedThisFrame) { return; }
 
         if (mouseHoveror.currentCell == null) { return; }
@@ -71,14 +73,17 @@ public class PlayerMovement : MonoBehaviour
 
         if (currentCellNumber == mouseHoveror.currentCell.GetCellNumber()) { return; }
 
-        destinationCellNumber = mouseHoveror.currentCell.GetCellNumber();
+        //destinationCellNumber = mouseHoveror.currentCell.GetCellNumber();
+        // Send message to go to new cell
+        MovementData movementData = new MovementData
+        {
+            playerId = networkPlayer.Id,
+            destinationCellNumber = mouseHoveror.currentCell.GetCellNumber()
+        };
+        webSocketManager.SendMessage(MessageType.Movement, JsonUtility.ToJson(movementData));
 
-        WebSocketManager.MovementData movementRequest = new WebSocketManager.MovementData(webSocketManager.myPlayerInformation.PlayerNumber, destinationCellNumber);
-        WebSocketManager.MessageContainer messageContainer = new WebSocketManager.MessageContainer(WebSocketManager.MessageType.Movement, JsonUtility.ToJson(movementRequest));
-        webSocketManager.ws.Send(Encoding.UTF8.GetBytes(JsonUtility.ToJson(messageContainer)));
     }
 
-   /// [Client]
     public void HandleDestinationCellChanged(int newCell)
     {
         {
@@ -123,10 +128,6 @@ public class PlayerMovement : MonoBehaviour
 
         currentCell = nextCell; // set current cell here since the movement will be completed - otherwise pathfinder may still include previous cell on multiple clicks
 
-      //  if (isLocalPlayer)
-        {
-   //         CmdSetCurrentCell(currentCell.GetCellNumber()); // Update cell number on server
-        }
 
         var nextCellPosition = nextCell.transform.position;
         var midPoint = (transform.position + nextCell.transform.position) / 2f;
@@ -157,13 +158,7 @@ public class PlayerMovement : MonoBehaviour
             // Check if player has past midpoint, once they have then move them to the new cell
             if ((Vector3.Distance(transform.position, nextCellPosition) < midwayPoint) && (hasHitMidpoint == false))
             {
-                if (GetComponent<Player>().PlayerNumber == webSocketManager.myPlayerInformation.PlayerNumber)
-                {
-                    webSocketManager.myPlayerInformation.OnCell = nextCell.cellNumber;
-                    WebSocketManager.MessageContainer updateInformationMessageContainer = new WebSocketManager.MessageContainer(WebSocketManager.MessageType.UpdateInformation, 
-                    JsonUtility.ToJson(FindObjectOfType<WebSocketManager>().myPlayerInformation));
-                    webSocketManager.ws.Send(Encoding.UTF8.GetBytes(JsonUtility.ToJson(updateInformationMessageContainer)));
-                }
+                // TODO: send to server that player has actually switched positions here
 
                 cellObject.UpdateCell(nextCell);
                 hasHitMidpoint = true;
@@ -202,12 +197,25 @@ public class PlayerMovement : MonoBehaviour
     }
 
     
-
- 
-
     #region Helper Functions
 
     public Cell FindCellWithNumber(int cellNumber)
+    {
+        Cell[] cells = FindObjectsOfType<Cell>();
+
+        foreach (Cell cell in cells)
+        {
+            if (cell.GetCellNumber() == cellNumber)
+            {
+                return cell;
+            }
+        }
+
+        Debug.LogError("Could not find cell with number - " + cellNumber);
+        return null;
+    }
+
+    public static Cell FindCellWithNumberTwo(int cellNumber)
     {
         Cell[] cells = FindObjectsOfType<Cell>();
 
@@ -243,6 +251,7 @@ public class PlayerMovement : MonoBehaviour
 
         return currentCell;
     }
+
 
     Vector3 TwoDToIso(Vector3 oldCoordinates)
     {

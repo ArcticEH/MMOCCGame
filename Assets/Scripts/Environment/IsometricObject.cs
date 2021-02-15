@@ -81,6 +81,11 @@ public class IsometricObject : MonoBehaviour
     // Find the cell that this isometric object belongs to based on position
     public Cell FindMyCell(int amountYRaised)
     {
+        if (name.Equals("smallDoubleBlockLeft"))
+        {
+            Debug.Log("stop here");
+        }
+
         cellsManager = FindObjectOfType<CellsManager>();
 
         foreach (Cell cell in cellsManager.cells)
@@ -92,7 +97,7 @@ public class IsometricObject : MonoBehaviour
         }
 
         // Error since we could not find cell
-        throw new System.Exception("Error finding cell for isometric object - " + gameObject.name);
+        throw new System.Exception($"Error finding cell for isometric object - {gameObject.name} , with position - {transform.position} ");
     }
 
     // Determines if player should be able to walk on this cell. Future implementation may consider more factors than just the variable.
