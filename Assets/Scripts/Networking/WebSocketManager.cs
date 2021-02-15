@@ -95,9 +95,7 @@ public class WebSocketManager : MonoBehaviour
                 ExistingSpawnData existingSpawnData = JsonUtility.FromJson<ExistingSpawnData>(messageContainer.MessageData);
                 var existingPlayer = Instantiate(playerPrefab);
                 NetworkPlayer existingPlayerNetworkPlayer = existingPlayer.GetComponent<NetworkPlayer>();
-                existingPlayerNetworkPlayer.Id = existingSpawnData.Id;
-                existingPlayerNetworkPlayer.PlayerNumber = existingSpawnData.playerNumber;
-                existingPlayerNetworkPlayer.GetComponentInChildren<PlayerLabel>().SetText($"Player {existingSpawnData.playerNumber}");
+                existingPlayerNetworkPlayer.SetSpawnedNetworkPlayerProperties("", existingSpawnData.playerNumber, existingSpawnData.Id);
                 existingPlayer.GetComponent<PlayerMovement>().currentCell = PlayerMovement.FindCellWithNumberTwo(existingSpawnData.cellNumber);
                 break;
             case MessageType.NewSpawn:
@@ -106,10 +104,15 @@ public class WebSocketManager : MonoBehaviour
                 SpawnData returnedSpawnData = JsonUtility.FromJson<SpawnData>(messageContainer.MessageData);
                 var player = Instantiate(playerPrefab);
                 var newSpawnNetworkPlayer = player.GetComponent<NetworkPlayer>();
-                newSpawnNetworkPlayer.Id = returnedSpawnData.playerId;
-                newSpawnNetworkPlayer.PlayerNumber = returnedSpawnData.playerNumber;
-                player.GetComponentInChildren<PlayerLabel>().SetText($"Player {newSpawnNetworkPlayer.PlayerNumber}");
+                newSpawnNetworkPlayer.SetSpawnedNetworkPlayerProperties("", returnedSpawnData.playerNumber, returnedSpawnData.playerId);
                 player.GetComponent<PlayerMovement>().currentCell = FindObjectOfType<Spawn>().GetComponent<Cell>();
+                break;
+            case MessageType.Despawn:
+                Debug.Log("Got message to despawn");
+                // Despawn player
+                DespawnData despawnData = JsonUtility.FromJson<DespawnData>(messageContainer.MessageData);
+                var playerToDespawn = FindObjectsOfType<NetworkPlayer>().Where(networkPlayer => networkPlayer.Id.Equals(despawnData.Id)).FirstOrDefault();
+                playerToDespawn.DespawnPlayer();
                 break;
             case MessageType.Movement:
                 Debug.Log("Got player movement");

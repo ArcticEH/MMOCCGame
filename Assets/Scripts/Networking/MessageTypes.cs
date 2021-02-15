@@ -3,7 +3,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 
 // All the possible websocket message types
 [Serializable]
@@ -12,6 +11,7 @@ public enum MessageType
     NewServerConnection,
     NewSpawn,
     ExistingSpawn,
+    Despawn,
     Movement
 }
 
@@ -38,6 +38,7 @@ public class SpawnData
     public int playerNumber;
 }
 
+
 [Serializable]
 public class MovementData
 {
@@ -62,6 +63,12 @@ public class ExistingSpawnData
     public string Id;
     public int playerNumber;
     public int cellNumber;
+}
+
+[Serializable]
+public class DespawnData
+{
+    public string Id;
 }
 
 
