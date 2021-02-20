@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using System.Text;
-using static WebSocketManager;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -27,6 +26,17 @@ public class PlayerMovement : MonoBehaviour
     CellObject cellObject;
     NetworkPlayer networkPlayer;
 
+    // Timer stuff
+    private DateTime currentFrameTime;
+    private DateTime lastFrameTime;
+    private float deltaTime = 0;
+
+    private void CalculateDeltaTime()
+    {
+        currentFrameTime = DateTime.Now;
+        deltaTime = (float)((currentFrameTime.Ticks - lastFrameTime.Ticks) / 10000000.0);
+        lastFrameTime = currentFrameTime;
+    }
 
     private void Awake()
     {
@@ -42,6 +52,10 @@ public class PlayerMovement : MonoBehaviour
         playerAnimator = GetComponent<Animator>();
         cellObject = GetComponent<CellObject>();
         networkPlayer = GetComponent<NetworkPlayer>();
+
+        // Instantiate values
+        currentFrameTime = DateTime.Now;
+        lastFrameTime = DateTime.Now;
     }
 
     private void Start()
@@ -63,6 +77,8 @@ public class PlayerMovement : MonoBehaviour
 
     private void Update()
     {
+        CalculateDeltaTime();
+
         if (networkPlayer.Id != webSocketManager.localNetworkPlayerId) { return;  } // Only check if this is the local player
 
         if (!Mouse.current.leftButton.wasPressedThisFrame) { return; }
@@ -71,16 +87,36 @@ public class PlayerMovement : MonoBehaviour
 
         if (!mouseHoveror.currentCell.GetIsWalkable()) { return; }
 
+
         if (currentCellNumber == mouseHoveror.currentCell.GetCellNumber()) { return; }
 
-        //destinationCellNumber = mouseHoveror.currentCell.GetCellNumber();
+        pathfinder.SetStartingCells(currentCell, mouseHoveror.currentCell);
+        currentPath = pathfinder.GetPath();
+
+        // Convert path to numbers
+        int[] cellNumbers = new int[currentPath.Count];
+        int[] cellXValues = new int[currentPath.Count];
+        int[] cellYValues = new int[currentPath.Count];
+
+
+        for (int i = 0; i < cellNumbers.Length; i++)
+        {
+            Cell cell = currentPath[i];
+            cellNumbers[i] = cell.cellNumber;
+            cellXValues[i] = (int)cell.transform.position.x;
+            cellYValues[i] = (int)cell.transform.position.y;
+        }
+
         // Send message to go to new cell
-        MovementData movementData = new MovementData
+        MovementDataRequest movementDataRequest = new MovementDataRequest
         {
             playerId = networkPlayer.Id,
-            destinationCellNumber = mouseHoveror.currentCell.GetCellNumber()
+            cellNumberPath = cellNumbers,
+            cellPathXValues = cellXValues,
+            cellPathYValues = cellYValues
         };
-        webSocketManager.SendMessage(MessageType.Movement, JsonUtility.ToJson(movementData));
+
+        webSocketManager.SendMessage(MessageType.MovementDataRequest, JsonUtility.ToJson(movementDataRequest));
 
     }
 
@@ -91,6 +127,16 @@ public class PlayerMovement : MonoBehaviour
             currentPath = pathfinder.GetPath();
             if (isPathing) { return; }
             PerformPathing();
+        }
+    }
+
+    public void HandlePlayerPositionChanged(int serverCurrentCell, float xPosition, float yPosition)
+    {
+        transform.position = new Vector3(xPosition, yPosition, transform.position.z);
+
+        if (serverCurrentCell != currentCellNumber)
+        {
+            cellObject.UpdateCell(FindCellWithNumber(serverCurrentCell));
         }
     }
 
@@ -152,22 +198,38 @@ public class PlayerMovement : MonoBehaviour
             playerAnimator.SetTrigger("faceRight");
         }
 
-
+        System.Diagnostics.Stopwatch stopWatch = new System.Diagnostics.Stopwatch();
+        stopWatch.Start();
+        int timesMoved = 0;
+        float distanceTravelled = 0f;
         while (transform.position != nextCellPosition)
         {
+            
+
+
             // Check if player has past midpoint, once they have then move them to the new cell
-            if ((Vector3.Distance(transform.position, nextCellPosition) < midwayPoint) && (hasHitMidpoint == false))
+            if ((Vector3.Distance(transform.position, nextCellPosition) < midwayPoint) && (hasHitMidpoint == false) || deltaTime > 0.5)
             {
                 // TODO: send to server that player has actually switched positions here
-
                 cellObject.UpdateCell(nextCell);
                 hasHitMidpoint = true;
             }
+            timesMoved++;
+            //print($"Delta time - {deltaTime}");
 
-            var nextPosition = Vector3.MoveTowards(transform.position, nextCell.transform.position, movementSpeed * Time.deltaTime);
+            Vector3 nextPosition;
+            nextPosition = Vector3.MoveTowards(transform.position, nextCell.transform.position, movementSpeed * deltaTime);
+
+            // Update distance travelled 
+            distanceTravelled += (Vector3.Distance(transform.position, nextPosition));
+            //print($"Distance travelled = {distanceTravelled}");
+
+
             transform.position = nextPosition;
             yield return null;
         }
+        stopWatch.Stop();
+        Debug.Log("Time to move to cell: " + stopWatch.ElapsedMilliseconds + " In steps - " + timesMoved);
 
         //cellObject.UpdateCell(nextCell); // for sprite sorting this should happen halfway through
         cellObject.FixPositionToCell();

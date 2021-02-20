@@ -114,14 +114,14 @@ public class WebSocketManager : MonoBehaviour
                 var playerToDespawn = FindObjectsOfType<NetworkPlayer>().Where(networkPlayer => networkPlayer.Id.Equals(despawnData.Id)).FirstOrDefault();
                 playerToDespawn.DespawnPlayer();
                 break;
-            case MessageType.Movement:
+            case MessageType.MovementDataUpdate:
                 Debug.Log("Got player movement");
                 // Move player
-                MovementData movementData = JsonUtility.FromJson<MovementData>(messageContainer.MessageData);
+                MovementDataUpdate movementDataUpdate = JsonUtility.FromJson<MovementDataUpdate>(messageContainer.MessageData);
                 // Find player with the id
                 NetworkPlayer[] networkPlayers = FindObjectsOfType<NetworkPlayer>();
-                NetworkPlayer playerToMove = networkPlayers.Where(networkPlayer => networkPlayer.Id.Equals(movementData.playerId)).FirstOrDefault();
-                playerToMove.GetComponent<PlayerMovement>().HandleDestinationCellChanged(movementData.destinationCellNumber);
+                NetworkPlayer playerToMove = networkPlayers.Where(networkPlayer => networkPlayer.Id.Equals(movementDataUpdate.playerId)).FirstOrDefault();
+                playerToMove.GetComponent<PlayerMovement>().HandlePlayerPositionChanged(movementDataUpdate.cellNumber, movementDataUpdate.xPosition, movementDataUpdate.yPosition);
                 break;
         }
     }

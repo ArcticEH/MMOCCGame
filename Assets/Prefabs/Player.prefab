@@ -232,7 +232,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   destinationCellNumber: 0
   currentCellNumber: 0
-  movementSpeed: 75
+  movementSpeed: 62.609905
   currentCell: {fileID: 0}
   currentPath: []
   isPathing: 0
