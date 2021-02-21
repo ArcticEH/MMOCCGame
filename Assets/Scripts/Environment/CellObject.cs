@@ -5,7 +5,7 @@ using UnityEngine;
 public class CellObject : MonoBehaviour
 {
     [SerializeField] IsometricObject[] myIsometricObjects;
-    [SerializeField] Cell myCell;
+    [SerializeField] public Cell myCell;
     [SerializeField] private int amountYRaised;
 
     private void Start()

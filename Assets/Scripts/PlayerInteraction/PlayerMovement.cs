@@ -130,14 +130,24 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    public void HandlePlayerPositionChanged(int serverCurrentCell, float xPosition, float yPosition)
+    public void HandlePlayerPositionChanged(MovementDataUpdate movementDataUpdate)
     {
-        transform.position = new Vector3(xPosition, yPosition, transform.position.z);
+        print("Got movement message");
+        transform.position = new Vector3(movementDataUpdate.xPosition, movementDataUpdate.yPosition, transform.position.z);
 
-        if (serverCurrentCell != currentCellNumber)
+        if (movementDataUpdate.cellNumber != currentCellNumber)
         {
-            cellObject.UpdateCell(FindCellWithNumber(serverCurrentCell));
+            Cell cell = FindCellWithNumber(movementDataUpdate.cellNumber);       
+            currentCellNumber = cell.cellNumber;
+            currentCell = cell;
         }
+
+        if (movementDataUpdate.sortingCellNumber != cellObject.myCell.cellNumber)
+        {
+            Cell cell = FindCellWithNumber(movementDataUpdate.sortingCellNumber);
+            cellObject.UpdateCell(cell);
+        }
+        
     }
 
    /// [Client]

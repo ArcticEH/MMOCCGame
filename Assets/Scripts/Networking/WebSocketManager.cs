@@ -121,7 +121,7 @@ public class WebSocketManager : MonoBehaviour
                 // Find player with the id
                 NetworkPlayer[] networkPlayers = FindObjectsOfType<NetworkPlayer>();
                 NetworkPlayer playerToMove = networkPlayers.Where(networkPlayer => networkPlayer.Id.Equals(movementDataUpdate.playerId)).FirstOrDefault();
-                playerToMove.GetComponent<PlayerMovement>().HandlePlayerPositionChanged(movementDataUpdate.cellNumber, movementDataUpdate.xPosition, movementDataUpdate.yPosition);
+                playerToMove.GetComponent<PlayerMovement>().HandlePlayerPositionChanged(movementDataUpdate);
                 break;
         }
     }
