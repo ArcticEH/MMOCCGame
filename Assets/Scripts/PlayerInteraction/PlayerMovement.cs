@@ -26,17 +26,6 @@ public class PlayerMovement : MonoBehaviour
     CellObject cellObject;
     NetworkPlayer networkPlayer;
 
-    // Timer stuff
-    private DateTime currentFrameTime;
-    private DateTime lastFrameTime;
-    private float deltaTime = 0;
-
-    private void CalculateDeltaTime()
-    {
-        currentFrameTime = DateTime.Now;
-        deltaTime = (float)((currentFrameTime.Ticks - lastFrameTime.Ticks) / 10000000.0);
-        lastFrameTime = currentFrameTime;
-    }
 
     private void Awake()
     {
@@ -53,31 +42,20 @@ public class PlayerMovement : MonoBehaviour
         cellObject = GetComponent<CellObject>();
         networkPlayer = GetComponent<NetworkPlayer>();
 
-        // Instantiate values
-        currentFrameTime = DateTime.Now;
-        lastFrameTime = DateTime.Now;
     }
 
     private void Start()
     {
         // Place at where server says current cell is
-        // currentCell = FindCellWithNumber(currentCellNumber);
+        currentCell = FindCellWithNumber(currentCellNumber);
         cellObject.UpdateCell(currentCell);
         cellObject.FixPositionToCell();
-
-        // Start pathing if player is currently moving
-        if (currentCellNumber != destinationCellNumber)
-        {
-            pathfinder.SetStartingCells(currentCell, FindCellWithNumber(destinationCellNumber));
-            currentPath = pathfinder.GetPath();
-            if (isPathing) { return; }
-            PerformPathing();
-        }
     }
 
     private void Update()
     {
-        CalculateDeltaTime();
+
+        // Determine if valid movement request was received
 
         if (networkPlayer.Id != webSocketManager.localNetworkPlayerId) { return;  } // Only check if this is the local player
 
@@ -90,15 +68,17 @@ public class PlayerMovement : MonoBehaviour
 
         if (currentCellNumber == mouseHoveror.currentCell.GetCellNumber()) { return; }
 
+
+        // Create movement request passage from pathfind
+
+        // Get path
         pathfinder.SetStartingCells(currentCell, mouseHoveror.currentCell);
         currentPath = pathfinder.GetPath();
 
-        // Convert path to numbers
+        // Create values for message
         int[] cellNumbers = new int[currentPath.Count];
         int[] cellXValues = new int[currentPath.Count];
         int[] cellYValues = new int[currentPath.Count];
-
-
         for (int i = 0; i < cellNumbers.Length; i++)
         {
             Cell cell = currentPath[i];
@@ -107,7 +87,7 @@ public class PlayerMovement : MonoBehaviour
             cellYValues[i] = (int)cell.transform.position.y;
         }
 
-        // Send message to go to new cell
+        // Send message to server
         MovementDataRequest movementDataRequest = new MovementDataRequest
         {
             playerId = networkPlayer.Id,
@@ -120,155 +100,52 @@ public class PlayerMovement : MonoBehaviour
 
     }
 
-    public void HandleDestinationCellChanged(int newCell)
-    {
-        {
-            pathfinder.SetStartingCells(currentCell, FindCellWithNumber(newCell));
-            currentPath = pathfinder.GetPath();
-            if (isPathing) { return; }
-            PerformPathing();
-        }
-    }
-
     public void HandlePlayerPositionChanged(MovementDataUpdate movementDataUpdate)
     {
-        print("Got movement message");
-        transform.position = new Vector3(movementDataUpdate.xPosition, movementDataUpdate.yPosition, transform.position.z);
 
+   
+
+        // Update current cell number if different
         if (movementDataUpdate.cellNumber != currentCellNumber)
         {
+            // Determine direction that player is currrently facing
+            // Animation Triggers
+            if ((transform.position.x > movementDataUpdate.xPosition) && transform.position.y > movementDataUpdate.yPosition) // LEFT
+            {
+                playerAnimator.SetTrigger("faceLeft");
+            }
+            else if ((transform.position.x < movementDataUpdate.xPosition) && transform.position.y > movementDataUpdate.yPosition) // DOWN
+            {
+                playerAnimator.SetTrigger("faceDown");
+            }
+            else if ((transform.position.x > movementDataUpdate.xPosition) && transform.position.y < movementDataUpdate.yPosition) // UP
+            {
+                playerAnimator.SetTrigger("faceUp");
+            }
+            else if ((transform.position.x < movementDataUpdate.xPosition) && transform.position.y < movementDataUpdate.yPosition) // RIGHT
+            {
+                playerAnimator.SetTrigger("faceRight");
+            }
+
             Cell cell = FindCellWithNumber(movementDataUpdate.cellNumber);       
             currentCellNumber = cell.cellNumber;
             currentCell = cell;
+
         }
 
+        // Update sorting cell number if different
         if (movementDataUpdate.sortingCellNumber != cellObject.myCell.cellNumber)
         {
             Cell cell = FindCellWithNumber(movementDataUpdate.sortingCellNumber);
             cellObject.UpdateCell(cell);
         }
-        
-    }
 
-   /// [Client]
-    public void HandleCurrentCellChanged(int oldcell, int newCell)
-    {
-        // cell changed
-    }
-
-
-  //  [Client]
-    public void PerformPathing()
-    {
-
-        if (currentPath.Count == 0) { return; }
-
-        isPathing = true;
-        nextCell = currentPath[0];
-        currentPath.RemoveAt(0);
-
-        // Determine which direction this path is in
-        if (nextCell == currentCell)
-        {
-            CompletePath();
-        }
-        else
-        {
-            StartCoroutine(PerformMovement(nextCell));
-        }
-    }
-
-   
-    private IEnumerator PerformMovement(Cell nextCell)
-    {
-
-        currentCell = nextCell; // set current cell here since the movement will be completed - otherwise pathfinder may still include previous cell on multiple clicks
-
-
-        var nextCellPosition = nextCell.transform.position;
-        var midPoint = (transform.position + nextCell.transform.position) / 2f;
-        var hasHitMidpoint = false;
-        var midwayPoint = Vector3.Distance(transform.position, nextCellPosition) / 2;
-
-        // Animation Triggers
-        if ((transform.position.x > nextCellPosition.x) && transform.position.y > nextCellPosition.y) // LEFT
-        {
-            playerAnimator.SetTrigger("faceLeft");
-        }
-        else if ((transform.position.x < nextCellPosition.x) && transform.position.y > nextCellPosition.y) // DOWN
-        {
-            playerAnimator.SetTrigger("faceDown");
-        }
-        else if ((transform.position.x > nextCellPosition.x) && transform.position.y < nextCellPosition.y) // UP
-        {
-            playerAnimator.SetTrigger("faceUp");
-        }
-        else if ((transform.position.x < nextCellPosition.x) && transform.position.y < nextCellPosition.y) // RIGHT
-        {
-            playerAnimator.SetTrigger("faceRight");
-        }
-
-        System.Diagnostics.Stopwatch stopWatch = new System.Diagnostics.Stopwatch();
-        stopWatch.Start();
-        int timesMoved = 0;
-        float distanceTravelled = 0f;
-        while (transform.position != nextCellPosition)
-        {
-            
-
-
-            // Check if player has past midpoint, once they have then move them to the new cell
-            if ((Vector3.Distance(transform.position, nextCellPosition) < midwayPoint) && (hasHitMidpoint == false) || deltaTime > 0.5)
-            {
-                // TODO: send to server that player has actually switched positions here
-                cellObject.UpdateCell(nextCell);
-                hasHitMidpoint = true;
-            }
-            timesMoved++;
-            //print($"Delta time - {deltaTime}");
-
-            Vector3 nextPosition;
-            nextPosition = Vector3.MoveTowards(transform.position, nextCell.transform.position, movementSpeed * deltaTime);
-
-            // Update distance travelled 
-            distanceTravelled += (Vector3.Distance(transform.position, nextPosition));
-            //print($"Distance travelled = {distanceTravelled}");
-
-
-            transform.position = nextPosition;
-            yield return null;
-        }
-        stopWatch.Stop();
-        Debug.Log("Time to move to cell: " + stopWatch.ElapsedMilliseconds + " In steps - " + timesMoved);
-
-        //cellObject.UpdateCell(nextCell); // for sprite sorting this should happen halfway through
-        cellObject.FixPositionToCell();
-        CompletePath();
-    }
-
-    private void MoveToCell()
-    {
-        transform.parent = nextCell.transform;
-        transform.SetSiblingIndex(1);
-    }
-
-    // Checks if pathing should continue or stop
-    private void CompletePath()
-
-    {
-        // If there are still cells in pathing, then keep going. Otherwise stop.
-        if (currentPath.Count != 0)
-        {
-            PerformPathing();
-        }
-        else
-        {
-            isPathing = false;
-        }
+        // Update transform position
+        transform.position = new Vector3(movementDataUpdate.xPosition, movementDataUpdate.yPosition, transform.position.z);
 
     }
 
-    
+
     #region Helper Functions
 
     public Cell FindCellWithNumber(int cellNumber)
@@ -335,3 +212,136 @@ public class PlayerMovement : MonoBehaviour
 
     #endregion
 }
+
+
+
+///// [Client]
+// public void HandleCurrentCellChanged(int oldcell, int newCell)
+// {
+//     // cell changed
+// }
+
+
+//public void HandleDestinationCellChanged(int newCell)
+//{
+//    {
+//        pathfinder.SetStartingCells(currentCell, FindCellWithNumber(newCell));
+//        currentPath = pathfinder.GetPath();
+//        if (isPathing) { return; }
+//        PerformPathing();
+//    }
+//}
+
+////  [Client]
+//  public void PerformPathing()
+//  {
+
+//      if (currentPath.Count == 0) { return; }
+
+//      isPathing = true;
+//      nextCell = currentPath[0];
+//      currentPath.RemoveAt(0);
+
+//      // Determine which direction this path is in
+//      if (nextCell == currentCell)
+//      {
+//          CompletePath();
+//      }
+//      else
+//      {
+//          StartCoroutine(PerformMovement(nextCell));
+//      }
+//  }
+
+
+//private IEnumerator PerformMovement(Cell nextCell)
+//{
+
+//    currentCell = nextCell; // set current cell here since the movement will be completed - otherwise pathfinder may still include previous cell on multiple clicks
+
+
+//    var nextCellPosition = nextCell.transform.position;
+//    var midPoint = (transform.position + nextCell.transform.position) / 2f;
+//    var hasHitMidpoint = false;
+//    var midwayPoint = Vector3.Distance(transform.position, nextCellPosition) / 2;
+
+//    // Animation Triggers
+//    if ((transform.position.x > nextCellPosition.x) && transform.position.y > nextCellPosition.y) // LEFT
+//    {
+//        playerAnimator.SetTrigger("faceLeft");
+//    }
+//    else if ((transform.position.x < nextCellPosition.x) && transform.position.y > nextCellPosition.y) // DOWN
+//    {
+//        playerAnimator.SetTrigger("faceDown");
+//    }
+//    else if ((transform.position.x > nextCellPosition.x) && transform.position.y < nextCellPosition.y) // UP
+//    {
+//        playerAnimator.SetTrigger("faceUp");
+//    }
+//    else if ((transform.position.x < nextCellPosition.x) && transform.position.y < nextCellPosition.y) // RIGHT
+//    {
+//        playerAnimator.SetTrigger("faceRight");
+//    }
+
+//    System.Diagnostics.Stopwatch stopWatch = new System.Diagnostics.Stopwatch();
+//    stopWatch.Start();
+//    int timesMoved = 0;
+//    float distanceTravelled = 0f;
+//    while (transform.position != nextCellPosition)
+//    {
+
+
+
+//        // Check if player has past midpoint, once they have then move them to the new cell
+//        if ((Vector3.Distance(transform.position, nextCellPosition) < midwayPoint) && (hasHitMidpoint == false) || deltaTime > 0.5)
+//        {
+//            // TODO: send to server that player has actually switched positions here
+//            cellObject.UpdateCell(nextCell);
+//            hasHitMidpoint = true;
+//        }
+//        timesMoved++;
+//        //print($"Delta time - {deltaTime}");
+
+//        Vector3 nextPosition;
+//        nextPosition = Vector3.MoveTowards(transform.position, nextCell.transform.position, movementSpeed * deltaTime);
+
+//        // Update distance travelled 
+//        distanceTravelled += (Vector3.Distance(transform.position, nextPosition));
+//        //print($"Distance travelled = {distanceTravelled}");
+
+
+//        transform.position = nextPosition;
+//        yield return null;
+//    }
+//    stopWatch.Stop();
+//    Debug.Log("Time to move to cell: " + stopWatch.ElapsedMilliseconds + " In steps - " + timesMoved);
+
+//    //cellObject.UpdateCell(nextCell); // for sprite sorting this should happen halfway through
+//    cellObject.FixPositionToCell();
+//    CompletePath();
+//}
+
+//private void MoveToCell()
+//{
+//    transform.parent = nextCell.transform;
+//    transform.SetSiblingIndex(1);
+//}
+
+//// Checks if pathing should continue or stop
+//private void CompletePath()
+
+//{
+//    // If there are still cells in pathing, then keep going. Otherwise stop.
+//    if (currentPath.Count != 0)
+//    {
+//        PerformPathing();
+//    }
+//    else
+//    {
+//        isPathing = false;
+//    }
+
+//}
+
+
+
