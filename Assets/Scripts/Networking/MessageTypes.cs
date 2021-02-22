@@ -13,7 +13,8 @@ public enum MessageType
     ExistingSpawn,
     Despawn,
     MovementDataUpdate,
-    MovementDataRequest
+    MovementDataRequest,
+    InRoomChatMessage
 }
 
 // Message container is the actual object sent over the network
@@ -83,6 +84,13 @@ public class DespawnData
     public string Id;
 }
 
+[Serializable]
+public class InRoomChatMessageData
+{
+    public string chatMessage;
+    public string roomName;
+    public float messageXLocation;
+}
 
 
 

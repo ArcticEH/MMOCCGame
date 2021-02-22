@@ -148,7 +148,6 @@ GameObject:
   - component: {fileID: 3728668890746182110}
   - component: {fileID: -7880275974491553655}
   - component: {fileID: 3821686521398991521}
-  - component: {fileID: 691233752388718995}
   - component: {fileID: 3111989998330887407}
   - component: {fileID: -8938853355791285484}
   m_Layer: 0
@@ -253,21 +252,6 @@ MonoBehaviour:
   myIsometricObjects: []
   myCell: {fileID: 0}
   amountYRaised: 0
---- !u!114 &691233752388718995
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2438658846549957024}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 14dd2e28bd3a42544b9141c20d191f68, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  chatBubble: {fileID: 6739801880370705923, guid: 3de87043c67858b4ca44975fdae24a3c,
-    type: 3}
-  playerMovement: {fileID: -7880275974491553655}
 --- !u!114 &3111989998330887407
 MonoBehaviour:
   m_ObjectHideFlags: 0

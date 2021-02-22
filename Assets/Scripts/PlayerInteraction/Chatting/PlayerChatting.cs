@@ -7,74 +7,73 @@ using System;
 
 public class PlayerChatting : MonoBehaviour
 {
-    InputField chatbarText;
-    [SerializeField] GameObject chatBubble;
-    [SerializeField] PlayerMovement playerMovement;
-    //MyPlayer myPlayer;
-    ChatLogCanvas chatLogCanvas;
-
-    public static event Action ClientOnReceivedMessage;
-
-    #region Server
+    // Player Chatting
+    [SerializeField] ChatBubble chatBubblePrefab;
     
-    //[Command]
-    //public void CmdSendMessage(string message, Vector3 cellPosition)
-    //{ 
-    //    RpcHandleReceivedMessage(message, cellPosition);
-    //}
 
-    #endregion
+    // Events
+    public static Action OnReceivedChatMessage;
 
+    // Canvases
+    Chatbar chatBar;
+    ChatLogCanvas chatLogCanvas;
+    WindowCanvas windowsCanvas;
 
-    #region Client 
+    // Caches
+    WebSocketManager webSocketManager;
+    
+    
+    private void Awake()
+    {
+        webSocketManager = FindObjectOfType<WebSocketManager>();
+        chatBar = FindObjectOfType<Chatbar>();
+        chatLogCanvas = FindObjectOfType<ChatLogCanvas>();
+        chatBar.GetComponent<InputField>().ActivateInputField();
+    }
 
     private void Update()
     {
-        //chatbarText.ActivateInputField(); // !!! ACTIVATES ON EVERY FRAME. TEMPORARY SO PLAYER CAN ALWAYS TYPE WITHOUT NEEDING TO CLICK ON INPUT FIELD !!!
-
-        if (!Keyboard.current.enterKey.wasPressedThisFrame) { return; } // If player presses enter key
-
-        if (chatbarText.text == "") { return; } // if player chatbar does not contain text return
-
-   //     if (!isLocalPlayer) { return; } // if is not local player return
-
-   //     CmdSendMessage(myPlayer.GetPlayerName() + ": " + chatbarText.text, playerMovement.currentCell.transform.position); // send message with player name & text with player cell position
-
-        chatbarText.text = string.Empty; // Clear Chatbar Text
-    }
-
-   // [Client]
-    //public override void OnStartClient()
-    //{
-    //    base.OnStartClient();
-
-    //    myPlayer = GetComponent<MyPlayer>();
-    //    chatbarText = FindObjectOfType<Chatbar>().GetComponent<InputField>();
-    //    chatLogCanvas = FindObjectOfType<ChatLogCanvas>();
-    //}
-
-  //  [ClientRpc]
-    public void RpcHandleReceivedMessage(string message, Vector3 cellPosition)
-    {
-        var screenPosition = Camera.main.WorldToScreenPoint(cellPosition);
-
-        screenPosition.y = Screen.height * 2 / 3; // Sets screen position at 66.66% of screen height
+        // temporary until I figure out how to check if input field is activated to then activate input field. I want input field always active.
+        chatBar.GetComponent<InputField>().ActivateInputField();
         
-        var newMessage = Instantiate(chatBubble, chatLogCanvas.transform); // instantiates chat bubble prefab on chatlog canvas
+        if (!Keyboard.current.enterKey.wasPressedThisFrame) { return; }
 
-        newMessage.transform.position = screenPosition; // updates position of new bubble to screen position
+        var playerList = FindObjectsOfType<NetworkPlayer>();
 
-        newMessage.GetComponentInChildren<Text>().text = message; // searches for text component in new bubble and adds message text to it
+        string myPlayerID = webSocketManager.localNetworkPlayerId;
 
-        ClientOnReceivedMessage?.Invoke(); // triggers client received message event
+        string myPlayerName = "not found";
+        float myPlayerXLocation = default;
+
+        foreach (NetworkPlayer player in playerList)
+        {
+            if (player.Id == myPlayerID)
+            {
+                myPlayerName = player.PlayerName;
+                myPlayerXLocation = player.transform.position.x;
+            }
+        }
+
+        string chatMessage = myPlayerName + ": " + chatBar.GetComponent<InputField>().text;
+
+        InRoomChatMessageData newChatMessageData = new InRoomChatMessageData();
+        newChatMessageData.chatMessage = chatMessage;
+        newChatMessageData.messageXLocation = myPlayerXLocation;
+        newChatMessageData.roomName = "Welcome";
+
+        webSocketManager.SendMessage(MessageType.InRoomChatMessage, JsonUtility.ToJson(newChatMessageData));
+
+        chatBar.GetComponent<InputField>().text = "";
     }
 
-    #endregion
+    public void HandleReceivedInRoomMessage(InRoomChatMessageData messageData)
+    {
+        OnReceivedChatMessage?.Invoke();
 
+        var newChatBubble = Instantiate(chatBubblePrefab, FindObjectOfType<ChatLogCanvas>().transform);
 
-    #region Helper
-
-    #endregion
-
+        newChatBubble.GetComponentInChildren<Text>().text = messageData.chatMessage;
+        newChatBubble.transform.position = FindObjectOfType<Camera>().WorldToScreenPoint(new Vector3(messageData.messageXLocation, Screen.height * 0.20f, 0f));
+    }
 
 }

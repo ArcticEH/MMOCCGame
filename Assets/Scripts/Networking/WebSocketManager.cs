@@ -68,6 +68,8 @@ public class WebSocketManager : MonoBehaviour
 
     private void HandleMessage(MessageContainer messageContainer)
     {
+        Debug.Log(messageContainer.MessageData);
+
         switch (messageContainer.MessageType)
         {
             case MessageType.NewServerConnection:
@@ -104,7 +106,7 @@ public class WebSocketManager : MonoBehaviour
                 SpawnData returnedSpawnData = JsonUtility.FromJson<SpawnData>(messageContainer.MessageData);
                 var player = Instantiate(playerPrefab);
                 var newSpawnNetworkPlayer = player.GetComponent<NetworkPlayer>();
-                newSpawnNetworkPlayer.SetSpawnedNetworkPlayerProperties("", returnedSpawnData.playerNumber, returnedSpawnData.playerId);
+                newSpawnNetworkPlayer.SetSpawnedNetworkPlayerProperties("Player " + returnedSpawnData.playerNumber, returnedSpawnData.playerNumber, returnedSpawnData.playerId);
                 player.GetComponent<PlayerMovement>().currentCell = FindObjectOfType<Spawn>().GetComponent<Cell>();
                 break;
             case MessageType.Despawn:
@@ -122,6 +124,11 @@ public class WebSocketManager : MonoBehaviour
                 NetworkPlayer[] networkPlayers = FindObjectsOfType<NetworkPlayer>();
                 NetworkPlayer playerToMove = networkPlayers.Where(networkPlayer => networkPlayer.Id.Equals(movementDataUpdate.playerId)).FirstOrDefault();
                 playerToMove.GetComponent<PlayerMovement>().HandlePlayerPositionChanged(movementDataUpdate);
+                break;
+            case MessageType.InRoomChatMessage:
+                InRoomChatMessageData messageData = JsonUtility.FromJson<InRoomChatMessageData>(messageContainer.MessageData);
+                PlayerChatting playerChatting = FindObjectOfType<PlayerChatting>();
+                playerChatting.HandleReceivedInRoomMessage(messageData);
                 break;
         }
     }

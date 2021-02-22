@@ -8,7 +8,7 @@ public class ChatBubble : MonoBehaviour
 
     private void Start()
     {
-        PlayerChatting.ClientOnReceivedMessage += Scroll; // subscribe to event which triggers when client receives a chat bubble message
+        PlayerChatting.OnReceivedChatMessage += Scroll; // subscribe to event which triggers when client receives a chat bubble message
     }
 
 
