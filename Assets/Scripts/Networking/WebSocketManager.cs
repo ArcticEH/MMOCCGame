@@ -83,31 +83,23 @@ public class WebSocketManager : MonoBehaviour
                 localNetworkPlayerId = newServerConnectionData.Id;
 
                 // For now we immediately request to spawn
-                SpawnData spawnData = new SpawnData
+                SpawnRequest spawnData = new SpawnRequest
                 {
                     playerId = localNetworkPlayerId,
                     playerNumber = newServerConnectionData.PlayerNumber
                 };
 
-                SendMessage(MessageType.NewSpawn, JsonUtility.ToJson(spawnData));
+                SendMessage(MessageType.SpawnRequest, JsonUtility.ToJson(spawnData));
                 break;
-            case MessageType.ExistingSpawn:
+            case MessageType.SpawnResponse:
                 Debug.Log("Got message to spawn EXISTING player");
                 // Spawn existing player in room
-                ExistingSpawnData existingSpawnData = JsonUtility.FromJson<ExistingSpawnData>(messageContainer.MessageData);
+                SpawnResponse existingSpawnData = JsonUtility.FromJson<SpawnResponse>(messageContainer.MessageData);
                 var existingPlayer = Instantiate(playerPrefab);
                 NetworkPlayer existingPlayerNetworkPlayer = existingPlayer.GetComponent<NetworkPlayer>();
-                existingPlayerNetworkPlayer.SetSpawnedNetworkPlayerProperties("", existingSpawnData.playerNumber, existingSpawnData.Id);
-                existingPlayer.GetComponent<PlayerMovement>().currentCell = PlayerMovement.FindCellWithNumberTwo(existingSpawnData.cellNumber);
-                break;
-            case MessageType.NewSpawn:
-                Debug.Log("Got message to spawn NEW player");
-                // Spawn player
-                SpawnData returnedSpawnData = JsonUtility.FromJson<SpawnData>(messageContainer.MessageData);
-                var player = Instantiate(playerPrefab);
-                var newSpawnNetworkPlayer = player.GetComponent<NetworkPlayer>();
-                newSpawnNetworkPlayer.SetSpawnedNetworkPlayerProperties("Player " + returnedSpawnData.playerNumber, returnedSpawnData.playerNumber, returnedSpawnData.playerId);
-                player.GetComponent<PlayerMovement>().currentCell = FindObjectOfType<Spawn>().GetComponent<Cell>();
+                existingPlayerNetworkPlayer.SetSpawnedNetworkPlayerProperties("", existingSpawnData.playerNumber, existingSpawnData.playerId);
+                existingPlayer.GetComponent<PlayerMovement>().SpawnPlayer(existingSpawnData);
+                print($"Giving player {existingSpawnData.playerId} cell: {existingSpawnData.cellNumber}");
                 break;
             case MessageType.Despawn:
                 Debug.Log("Got message to despawn");
@@ -117,7 +109,7 @@ public class WebSocketManager : MonoBehaviour
                 playerToDespawn.DespawnPlayer();
                 break;
             case MessageType.MovementDataUpdate:
-                Debug.Log("Got player movement");
+                //Debug.Log("Got player movement");
                 // Move player
                 MovementDataUpdate movementDataUpdate = JsonUtility.FromJson<MovementDataUpdate>(messageContainer.MessageData);
                 // Find player with the id

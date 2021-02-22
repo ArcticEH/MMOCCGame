@@ -46,10 +46,18 @@ public class PlayerMovement : MonoBehaviour
 
     private void Start()
     {
-        // Place at where server says current cell is
-        currentCell = FindCellWithNumber(currentCellNumber);
-        cellObject.UpdateCell(currentCell);
+    }
+
+    public void SpawnPlayer(SpawnResponse existingSpawnData)
+    {
+        // TODO: Get player direction facing
+
+        currentCell = FindCellWithNumber(existingSpawnData.cellNumber);
+        cellObject.UpdateCell(FindCellWithNumber(existingSpawnData.sortingCellNumber));
         cellObject.FixPositionToCell();
+
+        // Update transform position
+        transform.position = new Vector3(existingSpawnData.xPosition, existingSpawnData.yPosition, transform.position.z);
     }
 
     private void Update()
@@ -102,8 +110,6 @@ public class PlayerMovement : MonoBehaviour
 
     public void HandlePlayerPositionChanged(MovementDataUpdate movementDataUpdate)
     {
-
-   
 
         // Update current cell number if different
         if (movementDataUpdate.cellNumber != currentCellNumber)

@@ -12,15 +12,15 @@ public class NetworkPlayer : MonoBehaviour
     // Room information
     public string Room;
 
-    public void SetSpawnedNetworkPlayerProperties(string playerName, int playerNumber, string id)
+    public void SetSpawnedNetworkPlayerProperties(string playerName, int playerNumber, string playerId)
     {
         // Set self attributes
-        PlayerName = playerName;
+        PlayerName = $"Player {playerNumber}";
         PlayerNumber = playerNumber;
-        Id = id;
+        Id = playerId;
 
         // Set player label
-        GetComponentInChildren<PlayerLabel>().SetText($"Player {playerNumber}");
+        GetComponentInChildren<PlayerLabel>().SetText($"Player {PlayerNumber}");
 
     }
 
