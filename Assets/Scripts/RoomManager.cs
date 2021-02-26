@@ -14,7 +14,7 @@ public class RoomManager : MonoBehaviour
         SpawnRequest spawnRequest = new SpawnRequest()
         {
             playerId = webSocketManager.localNetworkPlayerId,
-            roomId = 1
+            roomId = webSocketManager.lastRoomIdJoined
         };
 
         string json = JsonUtility.ToJson(spawnRequest);

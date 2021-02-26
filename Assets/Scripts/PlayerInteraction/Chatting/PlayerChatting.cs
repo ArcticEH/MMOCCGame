@@ -57,9 +57,11 @@ public class PlayerChatting : MonoBehaviour
         string chatMessage = myPlayerName + ": " + chatBar.GetComponent<InputField>().text;
 
         InRoomChatMessageData newChatMessageData = new InRoomChatMessageData();
+
+        // TODO: create this properly
         newChatMessageData.chatMessage = chatMessage;
         newChatMessageData.messageXLocation = myPlayerXLocation;
-        newChatMessageData.roomName = "Welcome";
+        newChatMessageData.roomId = webSocketManager.lastRoomIdJoined;
 
         webSocketManager.SendMessage(MessageType.InRoomChatMessage, JsonUtility.ToJson(newChatMessageData));
 
