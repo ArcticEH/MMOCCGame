@@ -44,5 +44,21 @@ public class GameSceneManager : MonoBehaviour
         SceneManager.LoadScene(3);
     }
 
+    public void LeaveRoom()
+    {
+        // Send message to leave room
+        DespawnRequest despawnRequest = new DespawnRequest
+        {
+            Id = webSocketManager.localNetworkPlayerId,
+            RoomId = webSocketManager.lastRoomIdJoined
+        };
+
+        webSocketManager.SendMessage(MessageType.DespawnRequest, JsonUtility.ToJson(despawnRequest));
+
+        // Leave room
+        webSocketManager.lastRoomIdJoined = -1;
+        SceneManager.LoadScene(2);
+    }
+
 
 }
