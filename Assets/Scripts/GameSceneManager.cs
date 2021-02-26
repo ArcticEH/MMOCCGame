@@ -7,11 +7,10 @@ using UnityEngine.UI;
 
 public class GameSceneManager : MonoBehaviour
 {
-    WebSocketManager webSocketManager;
-    SceneManager sceneManager;
+    // Two static references
+    [SerializeField] WebSocketManager webSocketManager;
 
-    // Start is called before the first frame update
-    void Start()
+    private void Start()
     {
         webSocketManager = FindObjectOfType<WebSocketManager>();
     }

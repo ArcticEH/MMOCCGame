@@ -22,9 +22,11 @@ public class WebSocketManager : MonoBehaviour
 
     [SerializeField] public String playerName;
 
+    [SerializeField] public GameSceneManager gameSceneManager;
+
     public WebSocket ws;
 
-    public int lastRoomIdJoined;
+    [SerializeField] public int lastRoomIdJoined = -1;
 
     // Queue used to receive messages from websocket events
     Queue<MessageContainer>  receivedMessages = new Queue<MessageContainer>();
@@ -137,7 +139,7 @@ public class WebSocketManager : MonoBehaviour
                 };
 
                 // Open lobby scene
-                FindObjectOfType<GameSceneManager>().NavigateToLobbyScene();
+                gameSceneManager.NavigateToLobbyScene();
 
                 break;
             case MessageType.SpawnResponse:
