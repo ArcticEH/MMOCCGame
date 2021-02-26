@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.InputSystem;
 using System;
+using TMPro;
 
 public class PlayerChatting : MonoBehaviour
 {
@@ -15,7 +16,7 @@ public class PlayerChatting : MonoBehaviour
     public static Action OnReceivedChatMessage;
 
     // Canvases
-    Chatbar chatBar;
+    [SerializeField] Chatbar chatBar;
     ChatLogCanvas chatLogCanvas;
     WindowCanvas windowsCanvas;
 
@@ -28,13 +29,13 @@ public class PlayerChatting : MonoBehaviour
         webSocketManager = FindObjectOfType<WebSocketManager>();
         chatBar = FindObjectOfType<Chatbar>();
         chatLogCanvas = FindObjectOfType<ChatLogCanvas>();
-        chatBar.GetComponent<InputField>().ActivateInputField();
+        chatBar.GetComponent<TMP_InputField>().ActivateInputField();
     }
 
     private void Update()
     {
         // temporary until I figure out how to check if input field is activated to then activate input field. I want input field always active.
-        chatBar.GetComponent<InputField>().ActivateInputField();
+        chatBar.GetComponent<TMP_InputField>().ActivateInputField();
         
         if (!Keyboard.current.enterKey.wasPressedThisFrame) { return; }
 
@@ -54,7 +55,7 @@ public class PlayerChatting : MonoBehaviour
             }
         }
 
-        string chatMessage = myPlayerName + ": " + chatBar.GetComponent<InputField>().text;
+        string chatMessage = myPlayerName + ": " + chatBar.GetComponent<TMP_InputField>().text;
 
         InRoomChatMessageData newChatMessageData = new InRoomChatMessageData();
 
@@ -65,7 +66,7 @@ public class PlayerChatting : MonoBehaviour
 
         webSocketManager.SendMessage(MessageType.InRoomChatMessage, JsonUtility.ToJson(newChatMessageData));
 
-        chatBar.GetComponent<InputField>().text = "";
+        chatBar.GetComponent<TMP_InputField>().text = "";
     }
 
     public void HandleReceivedInRoomMessage(InRoomChatMessageData messageData)
