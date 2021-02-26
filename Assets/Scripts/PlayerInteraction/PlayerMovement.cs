@@ -15,6 +15,7 @@ public class PlayerMovement : MonoBehaviour
     PathFinder pathfinder;
     public Cell currentCell;
     Cell nextCell;
+    FacingDirection facingDirection = FacingDirection.right;
     public List<Cell> currentPath;
     public bool isPathing = false;
 
@@ -50,11 +51,28 @@ public class PlayerMovement : MonoBehaviour
 
     public void SpawnPlayer(SpawnResponse existingSpawnData)
     {
-        // TODO: Get player direction facing
-
         currentCell = FindCellWithNumber(existingSpawnData.cellNumber);
         cellObject.UpdateCell(FindCellWithNumber(existingSpawnData.sortingCellNumber));
         cellObject.FixPositionToCell();
+
+        // Set spawn facing direction
+        if (existingSpawnData.facingDirection == FacingDirection.left)
+        {
+            playerAnimator.SetTrigger("faceLeft");
+        }
+        else if (existingSpawnData.facingDirection == FacingDirection.down)
+        {
+            playerAnimator.SetTrigger("faceDown");
+        }
+        else if (existingSpawnData.facingDirection == FacingDirection.up)
+        {
+            playerAnimator.SetTrigger("faceUp");
+        }
+        else if (existingSpawnData.facingDirection == FacingDirection.right)
+        {
+            playerAnimator.SetTrigger("faceRight");
+        }
+
 
         // Update transform position
         transform.position = new Vector3(existingSpawnData.xPosition, existingSpawnData.yPosition, transform.position.z);
@@ -72,7 +90,6 @@ public class PlayerMovement : MonoBehaviour
         if (mouseHoveror.currentCell == null) { return; }
 
         if (!mouseHoveror.currentCell.GetIsWalkable()) { return; }
-
 
         if (currentCellNumber == mouseHoveror.currentCell.GetCellNumber()) { return; }
 
@@ -110,30 +127,17 @@ public class PlayerMovement : MonoBehaviour
 
     public void HandlePlayerPositionChanged(MovementDataUpdate movementDataUpdate)
     {
+        Debug.Log(movementDataUpdate);
 
         // Update current cell number if different
         if (movementDataUpdate.cellNumber != currentCellNumber)
         {
-            // Determine direction that player is currrently facing
+            // Determine direction that player is currently facing
             // Animation Triggers
-            if ((transform.position.x > movementDataUpdate.xPosition) && transform.position.y > movementDataUpdate.yPosition) // LEFT
-            {
-                playerAnimator.SetTrigger("faceLeft");
-            }
-            else if ((transform.position.x < movementDataUpdate.xPosition) && transform.position.y > movementDataUpdate.yPosition) // DOWN
-            {
-                playerAnimator.SetTrigger("faceDown");
-            }
-            else if ((transform.position.x > movementDataUpdate.xPosition) && transform.position.y < movementDataUpdate.yPosition) // UP
-            {
-                playerAnimator.SetTrigger("faceUp");
-            }
-            else if ((transform.position.x < movementDataUpdate.xPosition) && transform.position.y < movementDataUpdate.yPosition) // RIGHT
-            {
-                playerAnimator.SetTrigger("faceRight");
-            }
 
-            Cell cell = FindCellWithNumber(movementDataUpdate.cellNumber);       
+            CheckFacingDirection(movementDataUpdate);
+
+            Cell cell = FindCellWithNumber(movementDataUpdate.cellNumber);
             currentCellNumber = cell.cellNumber;
             currentCell = cell;
 
@@ -214,6 +218,26 @@ public class PlayerMovement : MonoBehaviour
         newCoordinates.x = oldCoordinates.x - oldCoordinates.y;
         newCoordinates.y = (oldCoordinates.x + oldCoordinates.y) / 2;
         return newCoordinates;
+    }
+
+    private void CheckFacingDirection(MovementDataUpdate movementDataUpdate)
+    {
+        if (movementDataUpdate.facingDirection == FacingDirection.left) // LEFT
+        {
+            playerAnimator.SetTrigger("faceLeft");
+        }
+        else if (movementDataUpdate.facingDirection == FacingDirection.down) // DOWN
+        {
+            playerAnimator.SetTrigger("faceDown");
+        }
+        else if (movementDataUpdate.facingDirection == FacingDirection.up) // UP
+        {
+            playerAnimator.SetTrigger("faceUp");
+        }
+        else if (movementDataUpdate.facingDirection == FacingDirection.right) // RIGHT
+        {
+            playerAnimator.SetTrigger("faceRight");
+        }
     }
 
     #endregion
