@@ -20,7 +20,7 @@ public class NetworkPlayer : MonoBehaviour
         Id = playerId;
 
         // Set player label
-        GetComponentInChildren<PlayerLabel>().SetText($"Player {PlayerNumber}");
+        GetComponentInChildren<PlayerLabel>().SetText($"{playerName} (#{playerNumber})");
 
     }
 
