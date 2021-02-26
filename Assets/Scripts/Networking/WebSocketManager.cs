@@ -12,14 +12,35 @@ using System.Linq;
 
 public class WebSocketManager : MonoBehaviour
 {
+    private static WebSocketManager instance;
+
     [SerializeField] public string localNetworkPlayerId;
+
+    public NetworkPlayer loggedInNetworkPlayer;
 
     [SerializeField] NetworkPlayer playerPrefab;
 
+    [SerializeField] public String playerName;
+
     public WebSocket ws;
+
+    public int lastRoomIdJoined;
 
     // Queue used to receive messages from websocket events
     Queue<MessageContainer>  receivedMessages = new Queue<MessageContainer>();
+
+    private void Awake()
+    {
+        // Singleton approach 
+        if (instance != null && instance != this)
+        {
+            Destroy(this.gameObject);
+        }
+
+        instance = this;
+        DontDestroyOnLoad(this.gameObject);
+
+    }
 
     private void Update()
     {
@@ -33,6 +54,11 @@ public class WebSocketManager : MonoBehaviour
 
     // Use this for initialization
     void Start()
+    {
+
+    }
+
+    public void Connect()
     {
         // Create WebSocket instance
         ws = WebSocketFactory.CreateInstance("ws://localhost:9000/Chat");
@@ -49,7 +75,7 @@ public class WebSocketManager : MonoBehaviour
         {
 
             // Handle deserialization process
-            string json = Encoding.UTF8.GetString(msg); 
+            string json = Encoding.UTF8.GetString(msg);
             MessageContainer messageContainer = JsonUtility.FromJson<MessageContainer>(json);
 
             // Add it to the queue
@@ -58,13 +84,14 @@ public class WebSocketManager : MonoBehaviour
 
         // Add OnError event listener
         ws.OnError += (string errMsg) => { Debug.Log("WS error: " + errMsg); };
-            
+
         // Add OnClose event listener
         ws.OnClose += (WebSocketCloseCode code) => { Debug.Log("WS closed with code: " + code.ToString()); };
 
         // Connect to the server
         ws.Connect();
     }
+
 
     private void HandleMessage(MessageContainer messageContainer)
     {
@@ -74,22 +101,44 @@ public class WebSocketManager : MonoBehaviour
         {
             case MessageType.NewServerConnection:
                 // Add as local player
-
                 Debug.Log("Got new server connection");
-                //NewServerConnectionData newServerConnectionData = JsonConvert.DeserializeObject<NewServerConnectionData>(messageContainer.MessageData);
+                
                 NewServerConnectionData newServerConnectionData = JsonUtility.FromJson<NewServerConnectionData>(messageContainer.MessageData);
 
                 // Put in local network player temporarily
                 localNetworkPlayerId = newServerConnectionData.Id;
 
-                // For now we immediately request to spawn
-                SpawnRequest spawnData = new SpawnRequest
+                // Send login request with information
+                Login login = new Login()
                 {
-                    playerId = localNetworkPlayerId,
-                    playerNumber = newServerConnectionData.PlayerNumber
+                    PlayerName = playerName,
+                    playerId = localNetworkPlayerId
                 };
 
-                SendMessage(MessageType.SpawnRequest, JsonUtility.ToJson(spawnData));
+                SendMessage(MessageType.Login, JsonUtility.ToJson(login));
+                break;
+
+            case MessageType.LoginResponse:
+                Debug.Log("Got player login");
+                LoginResponse loginResponse = JsonUtility.FromJson<LoginResponse>(messageContainer.MessageData);
+
+                // Return if error from server (dont login)
+                if (!loginResponse.isSuccess)
+                {
+                    Debug.Log("Error message received from server on login");
+                    return;
+                }
+
+                // Set logged in networkPlayer info
+                loggedInNetworkPlayer = new NetworkPlayer()
+                {
+                    Id = localNetworkPlayerId,
+                    PlayerName = playerName,
+                };
+
+                // Open lobby scene
+                FindObjectOfType<GameSceneManager>().NavigateToLobbyScene();
+
                 break;
             case MessageType.SpawnResponse:
                 Debug.Log("Got message to spawn EXISTING player");
