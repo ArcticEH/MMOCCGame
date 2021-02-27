@@ -5,10 +5,10 @@ using UnityEngine;
 public class ChatBubble : MonoBehaviour
 {
     [SerializeField] float timeBetweenScroll = 3f;
-
+    
     private void Start()
     {
-        PlayerChatting.OnReceivedChatMessage += Scroll; // subscribe to event which triggers when client receives a chat bubble message
+        FindObjectOfType<PlayerChatting>().OnReceivedChatMessage += Scroll; // subscribe to event which triggers when client receives a chat bubble message
     }
 
 
@@ -22,6 +22,7 @@ public class ChatBubble : MonoBehaviour
             timeBetweenScroll = 3f;
         }
     }
+
 
     private void Scroll() // blinks chat bubble along the y axis by the bubble height
     {

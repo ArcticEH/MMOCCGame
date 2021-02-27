@@ -152,7 +152,7 @@ public class WebSocketManager : MonoBehaviour
                 existingPlayer.GetComponent<PlayerMovement>().SpawnPlayer(existingSpawnData);
                 print($"Giving player {existingSpawnData.playerId} cell: {existingSpawnData.cellNumber}");
                 break;
-            case MessageType.Despawn:
+            case MessageType.DespawnData:
                 Debug.Log("Got message to despawn");
                 // Despawn player
                 DespawnData despawnData = JsonUtility.FromJson<DespawnData>(messageContainer.MessageData);

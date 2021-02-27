@@ -10,10 +10,9 @@ public class PlayerChatting : MonoBehaviour
 {
     // Player Chatting
     [SerializeField] ChatBubble chatBubblePrefab;
-    
 
     // Events
-    public static Action OnReceivedChatMessage;
+    public Action OnReceivedChatMessage;
 
     // Canvases
     [SerializeField] Chatbar chatBar;
