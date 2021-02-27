@@ -57,7 +57,7 @@ public class GameSceneManager : MonoBehaviour
 
         // Leave room
         webSocketManager.lastRoomIdJoined = -1;
-        SceneManager.LoadScene(2);
+        SceneManager.LoadScene(1);
     }
 
 
