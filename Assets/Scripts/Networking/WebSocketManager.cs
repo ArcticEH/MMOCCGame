@@ -171,7 +171,7 @@ public class WebSocketManager : MonoBehaviour
             case MessageType.InRoomChatMessage:
                 InRoomChatMessageData messageData = JsonUtility.FromJson<InRoomChatMessageData>(messageContainer.MessageData);
                 PlayerChatting playerChatting = FindObjectOfType<PlayerChatting>();
-                playerChatting.HandleReceivedInRoomMessage(messageData);
+                StartCoroutine(playerChatting.HandleReceivedInRoomMessage(messageData));
                 break;
         }
     }

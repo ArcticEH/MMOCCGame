@@ -30,6 +30,7 @@ public class PlayerChatting : MonoBehaviour
         chatBar = FindObjectOfType<Chatbar>();
         chatLogCanvas = FindObjectOfType<ChatLogCanvas>();
         chatBar.GetComponent<TMP_InputField>().ActivateInputField();
+        windowsCanvas = FindObjectOfType<WindowCanvas>();
     }
 
     private void Update()
@@ -69,14 +70,40 @@ public class PlayerChatting : MonoBehaviour
         chatBar.GetComponent<TMP_InputField>().text = "";
     }
 
-    public void HandleReceivedInRoomMessage(InRoomChatMessageData messageData)
+    public IEnumerator HandleReceivedInRoomMessage(InRoomChatMessageData messageData)
     {
         OnReceivedChatMessage?.Invoke();
 
         var newChatBubble = Instantiate(chatBubblePrefab, FindObjectOfType<ChatLogCanvas>().transform);
+        Camera camera = FindObjectOfType<Camera>();
 
         newChatBubble.GetComponentInChildren<Text>().text = messageData.chatMessage;
-        newChatBubble.transform.position = FindObjectOfType<Camera>().WorldToScreenPoint(new Vector3(messageData.messageXLocation, Screen.height * 0.20f, 0f));
+        newChatBubble.transform.position = camera.WorldToScreenPoint(new Vector3(messageData.messageXLocation, Screen.height * 0.20f, 0f));
+
+        yield return new WaitForSeconds(0.2f);
+        RectTransform newBubbleRectTransform = newChatBubble.GetComponent<RectTransform>();
+        CheckIfInBounds(newBubbleRectTransform.anchoredPosition.x, newBubbleRectTransform.rect.width, newChatBubble);
+    }
+
+
+    public void CheckIfInBounds(float xPosition, float bubbleWidth, ChatBubble newChatBubble)
+    {
+        float rightSideOfScreen = chatLogCanvas.GetComponent<RectTransform>().rect.width / 2;
+        float leftSideOfScreen = (chatLogCanvas.GetComponent<RectTransform>().rect.width / 2) * -1;
+
+        if (xPosition - bubbleWidth / 2 < leftSideOfScreen)
+        {
+            Debug.Log("OFF LEFT SIDE OF SCREEN");
+            RectTransform rt = newChatBubble.GetComponent<RectTransform>();
+            rt.anchoredPosition = new Vector2(leftSideOfScreen + bubbleWidth / 2, rt.anchoredPosition.y);
+        }
+        
+        if (xPosition + bubbleWidth / 2 > rightSideOfScreen)
+        {
+            Debug.Log("OFF RIGHT SIDE OF SCREEN");
+            RectTransform rt = newChatBubble.GetComponent<RectTransform>();
+            rt.anchoredPosition = new Vector2(rightSideOfScreen - bubbleWidth / 2, rt.anchoredPosition.y);
+        }
     }
 
 }
