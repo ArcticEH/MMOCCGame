@@ -15,7 +15,7 @@ public class NetworkPlayer : MonoBehaviour
     public void SetSpawnedNetworkPlayerProperties(string playerName, int playerNumber, string playerId)
     {
         // Set self attributes
-        PlayerName = $"Player {playerNumber}";
+        PlayerName = $"{playerName} [#{playerNumber}]";
         PlayerNumber = playerNumber;
         Id = playerId;
 

@@ -148,7 +148,7 @@ public class WebSocketManager : MonoBehaviour
                 SpawnResponse existingSpawnData = JsonUtility.FromJson<SpawnResponse>(messageContainer.MessageData);
                 var existingPlayer = Instantiate(playerPrefab);
                 NetworkPlayer existingPlayerNetworkPlayer = existingPlayer.GetComponent<NetworkPlayer>();
-                existingPlayerNetworkPlayer.SetSpawnedNetworkPlayerProperties("", existingSpawnData.playerNumber, existingSpawnData.playerId);
+                existingPlayerNetworkPlayer.SetSpawnedNetworkPlayerProperties(existingSpawnData.playerName, existingSpawnData.playerNumber, existingSpawnData.playerId);
                 existingPlayer.GetComponent<PlayerMovement>().SpawnPlayer(existingSpawnData);
                 print($"Giving player {existingSpawnData.playerId} cell: {existingSpawnData.cellNumber}");
                 break;
