@@ -15,7 +15,7 @@ public class PlayerMovement : MonoBehaviour
     PathFinder pathfinder;
     public Cell currentCell;
     Cell nextCell;
-    FacingDirection facingDirection = FacingDirection.right;
+    PlayerState playerState = PlayerState.idleright;
     public List<Cell> currentPath;
     public bool isPathing = false;
 
@@ -57,21 +57,37 @@ public class PlayerMovement : MonoBehaviour
         cellObject.FixPositionToCell();
 
         // Set spawn facing direction
-        if (existingSpawnData.facingDirection == FacingDirection.left)
+        if (existingSpawnData.playerState == PlayerState.idleleft)
         {
-            playerAnimator.SetTrigger("faceLeft");
+            playerAnimator.SetTrigger("idleleft");
         }
-        else if (existingSpawnData.facingDirection == FacingDirection.down)
+        else if (existingSpawnData.playerState == PlayerState.walkingleft)
         {
-            playerAnimator.SetTrigger("faceDown");
+            playerAnimator.SetTrigger("walkingleft");
         }
-        else if (existingSpawnData.facingDirection == FacingDirection.up)
+        else if (existingSpawnData.playerState == PlayerState.idleup)
         {
-            playerAnimator.SetTrigger("faceUp");
+            playerAnimator.SetTrigger("idleup");
         }
-        else if (existingSpawnData.facingDirection == FacingDirection.right)
+        else if (existingSpawnData.playerState == PlayerState.walkingup)
         {
-            playerAnimator.SetTrigger("faceRight");
+            playerAnimator.SetTrigger("walkingup");
+        }
+        else if (existingSpawnData.playerState == PlayerState.idledown)
+        {
+            playerAnimator.SetTrigger("idledown");
+        }
+        else if (existingSpawnData.playerState == PlayerState.walkingdown)
+        {
+            playerAnimator.SetTrigger("walkingdown");
+        }
+        else if (existingSpawnData.playerState == PlayerState.idleright)
+        {
+            playerAnimator.SetTrigger("idleright");
+        }
+        else if (existingSpawnData.playerState == PlayerState.walkingright)
+        {
+            playerAnimator.SetTrigger("walkingright");
         }
 
 
@@ -133,10 +149,8 @@ public class PlayerMovement : MonoBehaviour
         // Update current cell number if different
         if (movementDataUpdate.cellNumber != currentCellNumber)
         {
-            // Determine direction that player is currently facing
+            // Determine player state
             // Animation Triggers
-
-            CheckFacingDirection(movementDataUpdate);
 
             Cell cell = FindCellWithNumber(movementDataUpdate.cellNumber);
             currentCellNumber = cell.cellNumber;
@@ -149,6 +163,11 @@ public class PlayerMovement : MonoBehaviour
         {
             Cell cell = FindCellWithNumber(movementDataUpdate.sortingCellNumber);
             cellObject.UpdateCell(cell);
+        }
+
+        if (this.playerState != movementDataUpdate.playerState)
+        {
+            CheckPlayerState(movementDataUpdate);
         }
 
         // Update transform position
@@ -221,23 +240,47 @@ public class PlayerMovement : MonoBehaviour
         return newCoordinates;
     }
 
-    private void CheckFacingDirection(MovementDataUpdate movementDataUpdate)
+    private void CheckPlayerState(MovementDataUpdate movementDataUpdate)
     {
-        if (movementDataUpdate.facingDirection == FacingDirection.left) // LEFT
+        if (movementDataUpdate.playerState == PlayerState.walkingleft) // LEFT
         {
-            playerAnimator.SetTrigger("faceLeft");
+            this.playerState = movementDataUpdate.playerState;
+            playerAnimator.SetTrigger("walkingleft");
         }
-        else if (movementDataUpdate.facingDirection == FacingDirection.down) // DOWN
+        else if (movementDataUpdate.playerState == PlayerState.idleleft)
         {
-            playerAnimator.SetTrigger("faceDown");
+            this.playerState = movementDataUpdate.playerState;
+            playerAnimator.SetTrigger("idleleft");
         }
-        else if (movementDataUpdate.facingDirection == FacingDirection.up) // UP
+        else if (movementDataUpdate.playerState == PlayerState.walkingdown) // DOWN
         {
-            playerAnimator.SetTrigger("faceUp");
+            this.playerState = movementDataUpdate.playerState;
+            playerAnimator.SetTrigger("walkingdown");
         }
-        else if (movementDataUpdate.facingDirection == FacingDirection.right) // RIGHT
+        else if (movementDataUpdate.playerState == PlayerState.idledown)
         {
-            playerAnimator.SetTrigger("faceRight");
+            this.playerState = movementDataUpdate.playerState;
+            playerAnimator.SetTrigger("idledown");
+        }
+        else if (movementDataUpdate.playerState == PlayerState.walkingup) // UP
+        {
+            this.playerState = movementDataUpdate.playerState;
+            playerAnimator.SetTrigger("walkingup");
+        }
+        else if (movementDataUpdate.playerState == PlayerState.idleup)
+        {
+            this.playerState = movementDataUpdate.playerState;
+            playerAnimator.SetTrigger("idleup");
+        }
+        else if (movementDataUpdate.playerState == PlayerState.walkingright) // RIGHT
+        {
+            this.playerState = movementDataUpdate.playerState;
+            playerAnimator.SetTrigger("walkingright");
+        }
+        else if (movementDataUpdate.playerState == PlayerState.idleright)
+        {
+            this.playerState = movementDataUpdate.playerState;
+            playerAnimator.SetTrigger("idleright");
         }
     }
 
