@@ -52,7 +52,8 @@ public class PlayerMovement : MonoBehaviour
     public void SpawnPlayer(SpawnResponse existingSpawnData)
     {
         currentCell = FindCellWithNumber(existingSpawnData.cellNumber);
-        cellObject.UpdateCell(FindCellWithNumber(existingSpawnData.sortingCellNumber));
+        Cell cell = FindCellWithNumber(existingSpawnData.sortingCellNumber);
+        cellObject.UpdateCell(cell);
         cellObject.FixPositionToCell();
 
         // Set spawn facing direction

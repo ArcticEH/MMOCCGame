@@ -11,6 +11,8 @@ public class IsometricObject : MonoBehaviour
     [SerializeField] public Cell myCell;
     [SerializeField] public int cellIndex;
 
+    [SerializeField] public bool assignToCellAutomatically = true; // Used for static objects like furniture
+
     // Cached
     [SerializeField] public CellsManager cellsManager;
 
@@ -23,7 +25,7 @@ public class IsometricObject : MonoBehaviour
 
     #endregion
 
-
+      
     private void Start()
     {
         // Assign cached variables

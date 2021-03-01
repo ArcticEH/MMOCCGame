@@ -189,7 +189,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5583120e77cd2b04dba7ed09968ea32c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  myIsometricObjects: []
+  myIsometricObjects:
+  - {fileID: 1414457834360138080}
   myCell: {fileID: 0}
   amountYRaised: 0
 --- !u!114 &3111989998330887407
@@ -436,6 +437,7 @@ MonoBehaviour:
   cellNumber: 0
   myCell: {fileID: 0}
   cellIndex: 0
+  assignToCellAutomatically: 0
   cellsManager: {fileID: 0}
 --- !u!1 &8138952357113613314
 GameObject:

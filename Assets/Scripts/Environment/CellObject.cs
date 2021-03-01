@@ -16,7 +16,9 @@ public class CellObject : MonoBehaviour
 
             foreach (IsometricObject io in myIsometricObjects)
             {
-                io.UpdateCell(amountYRaised);
+                // Only assign if isometric object allows it to be done automatically. 
+                if (io.assignToCellAutomatically)
+                     io.UpdateCell(amountYRaised);
             }
         
 
